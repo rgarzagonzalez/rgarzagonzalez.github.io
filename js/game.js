@@ -18,20 +18,26 @@ window.onload = function() {
 	let gridHeight = 5;
 
 	let grid = [
-		[1, 1, 1, 1, 1],
-		[1, 0, 1, 0, 1],
-		[1, 1, 0, 1, 1],
-		[1, 0, 0, 0, 1],
-		[1, 1, 1, 1, 1]
+		[0, 0, 1, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0]
 	];
 
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
 
+	let charPos = [2, 3];
+
 	function drawGrid() {
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {
 				placeTile(grid[i][j], j, i);
+
+				if(charPos[1] == i && charPos[0] == j) {
+					placeChar(j, i);
+				}
 			}
 		}
 	}
@@ -61,6 +67,21 @@ window.onload = function() {
 		cordsIso.push(posX, posY);
 
 		return cordsIso;
+	}
+
+	function placeChar(x, y) {
+		//place in cart grid
+		cCart.beginPath();
+		cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
+		cCart.fillStyle = 'yellow';
+		cCart.fill();
+
+		//place in iso grid
+		let cordsIso = cartToIso(x, y);
+		cIso.beginPath();
+		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
+		cIso.fillStyle = 'yellow';
+		cIso.fill();
 	}
 
 	drawGrid();
