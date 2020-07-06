@@ -30,6 +30,106 @@ window.onload = function() {
 
 	let charPos = [2, 3];
 
+	let Keys = {
+		UP: 38,
+		DOWN: 40,
+		LEFT: 37,
+		RIGHT: 39,
+		W: 87,
+		A: 65,
+		S: 83,
+		D: 68,
+		J: 74,
+		K: 75
+	}
+
+	window.addEventListener('keydown', function(e) {
+		keyDownHandler(e);
+	}, false);
+
+	function keyDownHandler(e) {
+		switch(e.keyCode) {
+			case Keys.UP:
+			case Keys.W:
+				moveMenu('up');
+				break;
+
+			case Keys.DOWN:
+			case Keys.S:
+				moveMenu('down');
+				break;
+
+			case Keys.LEFT:
+			case Keys.A:
+				break;
+
+			case Keys.RIGHT:
+			case Keys.D:
+				break;
+
+			case Keys.J:
+				actionButton();
+				break;
+		}
+	}
+
+	function moveMenu(direction) {
+		let menu = document.getElementById('menu_options');
+		let menuItems = [];
+		let currentItem;
+		let newItem;
+
+		for(let i = 0; i < menu.childNodes.length; i++) {
+			if(menu.childNodes[i].tagName == "LI") {
+				menuItems.push(i);
+				if(menu.childNodes[i].className == 'active') {
+					currentItem = i;
+					menu.childNodes[i].className = null;
+				}
+			}
+		}
+
+		newItem = (direction == 'up') ? menuItems.indexOf(currentItem) - 1 : menuItems.indexOf(currentItem) + 1;
+
+		if(newItem < 0) {
+			newItem = menuItems.length - 1;
+		}
+		else if(newItem == menuItems.length) {
+			newItem = 0;
+		}
+
+		newItem = menuItems[newItem];
+
+		menu.childNodes[newItem].className = 'active';
+
+	}
+
+	function actionButton() {
+		let menu = document.getElementById('menu_options');
+		let currentMenu;
+
+		for(let i = 0; i < menu.childNodes.length; i++) {
+			if(menu.childNodes[i].className == 'active') {
+				currentMenu = menu.childNodes[i].id;
+				break;
+			}
+		}
+
+		switch(currentMenu) {
+			case 'move':
+				console.log('mostrar rango de movimiento');
+				break;
+
+			case 'act':
+				console.log('mostrar menú de acciones');
+				break;
+
+			case 'wait':
+				console.log('Esperar');
+				break;
+		}
+	}
+
 	function drawGrid() {
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {

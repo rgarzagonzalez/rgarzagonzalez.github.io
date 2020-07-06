@@ -1,0 +1,23 @@
+#menu {
+	width: 200px;
+	background-color: #CCCC00;
+	padding:10px;
+}
+
+#menu ul {
+	margin: 0;
+	padding: 0;
+}
+
+#menu ul li {
+	list-style: none;
+	padding: 5px;
+}
+
+.active {
+	background-color: #CFFFFF;
+}
+
+.hidden {
+	display: none;
+}

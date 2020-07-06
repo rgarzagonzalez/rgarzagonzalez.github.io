@@ -2,11 +2,23 @@
 <html>
 <head>
 	<title>RPG Game</title>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<script src="js/game.js"></script>
 </head>
 <body>
 	<canvas id="gameCanvasCart" width="600" height="300"></canvas>
 	<canvas id="gameCanvasIso" width="600" height="300"></canvas>
+
+	<div id="ui">
+		<div id="menu">
+			<ul id="menu_options">
+				<li id="move" class="active">Move</li>
+				<li id="act">Action</li>
+				<li id="wait">Wait</li>
+			</ul>
+		</div>
+	</div>
 
 	<img src="img/greenTile.png" />
 	<img src = "img/redTile.png" />
