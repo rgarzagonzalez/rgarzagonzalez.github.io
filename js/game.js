@@ -43,6 +43,8 @@ window.onload = function() {
 		K: 75
 	}
 
+	let targetTiles = [];
+
 	window.addEventListener('keydown', function(e) {
 		keyDownHandler(e);
 	}, false);
@@ -117,7 +119,7 @@ window.onload = function() {
 
 		switch(currentMenu) {
 			case 'move':
-				console.log('mostrar rango de movimiento');
+				showMovementRange();
 				break;
 
 			case 'act':
@@ -130,10 +132,56 @@ window.onload = function() {
 		}
 	}
 
+	function showMovementRange() {
+		targetTiles = [];
+		let range = 2; //Que lo lea después de los atributos del personaje
+		let i = 0;
+		let currentPos = charPos;
+
+		let nPoint = charPos[1] - range;
+		let sPoint = charPos[1] + range;
+		let wPoint = charPos[0] - range;
+		let ePoint = charPos[0] + range;
+
+		for(let j = wPoint; j <= ePoint; j++) {
+			targetTiles[j] = [];
+		}
+
+		for(let j = 0; j <= sPoint - nPoint; j++) {
+			let north = nPoint + j;
+			let west = currentPos[0] - i;
+			let east = currentPos[0] + i;
+
+			if(west != east) {
+				for(let k = west; k <= east; k++) {
+					targetTiles[k][north] = 1;
+				}
+			}
+			else {
+				targetTiles[west][north] = 1;
+			}
+
+			if(north >= currentPos[1]) {
+				i--;
+			}
+			else {
+				i++;
+			}
+		}
+
+		drawGrid();
+	}
+
 	function drawGrid() {
+		cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
+		cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {
 				placeTile(grid[i][j], j, i);
+
+				if(targetTiles[j] != undefined && targetTiles[j][i] != undefined) {
+					placeMovableTile(j, i);
+				}
 
 				if(charPos[1] == i && charPos[0] == j) {
 					placeChar(j, i);
@@ -181,6 +229,21 @@ window.onload = function() {
 		cIso.beginPath();
 		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
 		cIso.fillStyle = 'yellow';
+		cIso.fill();
+	}
+
+	function placeMovableTile(x, y) {
+		//place in cart grid
+		cCart.beginPath();
+		cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
+		cCart.fillStyle = 'blue';
+		cCart.fill();
+
+		//place in iso grid
+		let cordsIso = cartToIso(x, y);
+		cIso.beginPath();
+		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
+		cIso.fillStyle = 'blue';
 		cIso.fill();
 	}
 
