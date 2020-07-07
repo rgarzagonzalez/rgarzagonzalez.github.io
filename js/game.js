@@ -11,6 +11,12 @@ window.onload = function() {
 	let redTile = new Image();
 	redTile.src = 'img/redTile.png';
 
+	let walkableTile = new Image();
+	walkableTile.src = 'img/walkableTile.png';
+
+	let activeTile = new Image();
+	activeTile.src = 'img/activeTile.png';
+
 	let tileWidth = greenTile.width;
 	let tileHeight = greenTile.height;
 
@@ -154,11 +160,16 @@ window.onload = function() {
 
 			if(west != east) {
 				for(let k = west; k <= east; k++) {
-					targetTiles[k][north] = 1;
+					if(k == currentPos[0] && north == currentPos[1]) {
+						targetTiles[k][north] = 3;
+					}
+					else {
+						targetTiles[k][north] = 2;
+					}
 				}
 			}
 			else {
-				targetTiles[west][north] = 1;
+				targetTiles[west][north] = 2;
 			}
 
 			if(north >= currentPos[1]) {
@@ -180,7 +191,7 @@ window.onload = function() {
 				placeTile(grid[i][j], j, i);
 
 				if(targetTiles[j] != undefined && targetTiles[j][i] != undefined) {
-					placeMovableTile(j, i);
+					placeTile(targetTiles[j][i], j, i);
 				}
 
 				if(charPos[1] == i && charPos[0] == j) {
@@ -191,17 +202,38 @@ window.onload = function() {
 	}
 
 	function placeTile(tileKind, x, y) {
+		let tile;
 		let posYCart = y * tileHeight;
 		let posXCart = x * tileHeight;
 
 		let cordsIso = cartToIso(x, y);
 
+		switch(tileKind) {
+			case 0:
+				cCart.fillStyle = '#00FF00';
+				tile = greenTile;
+				break;
+
+			case 1:
+				cCart.fillStyle = '#FF0000';
+				tile = redTile;
+				break;
+
+			case 2:
+				cCart.fillStyle = '#0000FF';
+				tile = walkableTile;
+				break;
+
+			case 3:
+				cCart.fillStyle = '#AAAAAA';
+				tile = activeTile;
+				break;
+		}
+
 		//place cart tile
-		cCart.fillStyle = (tileKind == 0) ? '#00FF00' : '#FF0000';
 		cCart.fillRect(posXCart, posYCart, tileHeight, tileHeight);
 
 		//Place Iso tile
-		let tile = (tileKind == 0) ? greenTile : redTile;
 		cIso.drawImage(tile, cordsIso[0], cordsIso[1], tileWidth, tileHeight);
 		
 	}
