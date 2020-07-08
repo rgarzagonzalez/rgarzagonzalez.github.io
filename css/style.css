@@ -1,15 +1,15 @@
-#menu {
+#actions {
 	width: 200px;
 	background-color: #CCCC00;
 	padding:10px;
 }
 
-#menu ul {
+#actions ul {
 	margin: 0;
 	padding: 0;
 }
 
-#menu ul li {
+#actions ul li {
 	list-style: none;
 	padding: 5px;
 }

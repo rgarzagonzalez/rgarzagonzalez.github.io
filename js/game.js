@@ -34,7 +34,9 @@ window.onload = function() {
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
 
-	let charPos = [2, 3];
+	let charPos = [4, 1];
+	let selTilePos = [];
+	let prevPos = [];
 
 	let Keys = {
 		UP: 38,
@@ -49,141 +51,18 @@ window.onload = function() {
 		K: 75
 	}
 
+	let states = {
+		current: 0,
+		prev: 0,
+		battleMenu: 0,
+		move: 1
+	}
+
 	let targetTiles = [];
 
-	window.addEventListener('keydown', function(e) {
-		keyDownHandler(e);
-	}, false);
-
-	function keyDownHandler(e) {
-		switch(e.keyCode) {
-			case Keys.UP:
-			case Keys.W:
-				moveMenu('up');
-				break;
-
-			case Keys.DOWN:
-			case Keys.S:
-				moveMenu('down');
-				break;
-
-			case Keys.LEFT:
-			case Keys.A:
-				break;
-
-			case Keys.RIGHT:
-			case Keys.D:
-				break;
-
-			case Keys.J:
-				actionButton();
-				break;
-		}
-	}
-
-	function moveMenu(direction) {
-		let menu = document.getElementById('menu_options');
-		let menuItems = [];
-		let currentItem;
-		let newItem;
-
-		for(let i = 0; i < menu.childNodes.length; i++) {
-			if(menu.childNodes[i].tagName == "LI") {
-				menuItems.push(i);
-				if(menu.childNodes[i].className == 'active') {
-					currentItem = i;
-					menu.childNodes[i].className = null;
-				}
-			}
-		}
-
-		newItem = (direction == 'up') ? menuItems.indexOf(currentItem) - 1 : menuItems.indexOf(currentItem) + 1;
-
-		if(newItem < 0) {
-			newItem = menuItems.length - 1;
-		}
-		else if(newItem == menuItems.length) {
-			newItem = 0;
-		}
-
-		newItem = menuItems[newItem];
-
-		menu.childNodes[newItem].className = 'active';
-
-	}
-
-	function actionButton() {
-		let menu = document.getElementById('menu_options');
-		let currentMenu;
-
-		for(let i = 0; i < menu.childNodes.length; i++) {
-			if(menu.childNodes[i].className == 'active') {
-				currentMenu = menu.childNodes[i].id;
-				break;
-			}
-		}
-
-		switch(currentMenu) {
-			case 'move':
-				showMovementRange();
-				break;
-
-			case 'act':
-				console.log('mostrar menú de acciones');
-				break;
-
-			case 'wait':
-				console.log('Esperar');
-				break;
-		}
-	}
-
-	function showMovementRange() {
-		targetTiles = [];
-		let range = 2; //Que lo lea después de los atributos del personaje
-		let i = 0;
-		let currentPos = charPos;
-
-		let nPoint = charPos[1] - range;
-		let sPoint = charPos[1] + range;
-		let wPoint = charPos[0] - range;
-		let ePoint = charPos[0] + range;
-
-		for(let j = wPoint; j <= ePoint; j++) {
-			targetTiles[j] = [];
-		}
-
-		for(let j = 0; j <= sPoint - nPoint; j++) {
-			let north = nPoint + j;
-			let west = currentPos[0] - i;
-			let east = currentPos[0] + i;
-
-			if(west != east) {
-				for(let k = west; k <= east; k++) {
-					if(k == currentPos[0] && north == currentPos[1]) {
-						targetTiles[k][north] = 3;
-					}
-					else {
-						targetTiles[k][north] = 2;
-					}
-				}
-			}
-			else {
-				targetTiles[west][north] = 2;
-			}
-
-			if(north >= currentPos[1]) {
-				i--;
-			}
-			else {
-				i++;
-			}
-		}
-
-		drawGrid();
-	}
 
 	function drawGrid() {
+		menuHandler(states.current);
 		cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
 		cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
 		for(let i = 0; i < gridHeight; i++) {
@@ -199,6 +78,27 @@ window.onload = function() {
 				}
 			}
 		}
+	}
+
+	function menuHandler(state) {
+		hideMenus();
+		switch(state) {
+			case 0:
+				showMenu('actions');
+				break;
+		}
+	}
+
+	function hideMenus() {
+		var menus = document.getElementsByClassName('menu');
+		for(let i = 0; i < menus.length; i++) {
+			menus[i].classList.add('hidden');
+		}
+	}
+
+	function showMenu(id) {
+		var menu = document.getElementById(id);
+		menu.classList.remove('hidden');
 	}
 
 	function placeTile(tileKind, x, y) {
@@ -238,17 +138,6 @@ window.onload = function() {
 		
 	}
 
-	function cartToIso(x, y) {
-		let cordsIso = [];
-
-		let posX = ((x - y) * (tileWidth / 2)) + xOffset;
-		let posY = ((x + y) * (tileHeight / 2)) + yOffset;
-
-		cordsIso.push(posX, posY);
-
-		return cordsIso;
-	}
-
 	function placeChar(x, y) {
 		//place in cart grid
 		cCart.beginPath();
@@ -264,20 +153,239 @@ window.onload = function() {
 		cIso.fill();
 	}
 
-	function placeMovableTile(x, y) {
-		//place in cart grid
-		cCart.beginPath();
-		cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
-		cCart.fillStyle = 'blue';
-		cCart.fill();
+	function cartToIso(x, y) {
+		let cordsIso = [];
 
-		//place in iso grid
-		let cordsIso = cartToIso(x, y);
-		cIso.beginPath();
-		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
-		cIso.fillStyle = 'blue';
-		cIso.fill();
+		let posX = ((x - y) * (tileWidth / 2)) + xOffset;
+		let posY = ((x + y) * (tileHeight / 2)) + yOffset;
+
+		cordsIso.push(posX, posY);
+
+		return cordsIso;
 	}
+
+	function keyDownHandler(e) {
+		switch(e.keyCode) {
+			case Keys.UP:
+			case Keys.W:
+				move('up');
+				break;
+
+			case Keys.DOWN:
+			case Keys.S:
+				move('down');
+				break;
+
+			case Keys.LEFT:
+			case Keys.A:
+				move('left');
+				break;
+
+			case Keys.RIGHT:
+			case Keys.D:
+				move('right');
+				break;
+
+			case Keys.J:
+				actionButton();
+				break;
+
+			case Keys.K:
+				cancelButton();
+				break;
+		}
+	}
+
+	function move(direction){
+		switch(states.current) {
+			case 0:
+				moveMenu(direction);
+				break;
+
+			case 1:
+				moveTargetTile(direction);
+				break;
+		}
+	}
+
+	function moveMenu(direction) {
+		let menu = document.getElementById('menu_options');
+		let menuItems = [];
+		let currentItem;
+		let newItem;
+
+		for(let i = 0; i < menu.childNodes.length; i++) {
+			if(menu.childNodes[i].tagName == "LI") {
+				menuItems.push(i);
+				if(menu.childNodes[i].className == 'active') {
+					currentItem = i;
+					menu.childNodes[i].className = null;
+				}
+			}
+		}
+
+		if(direction == 'up') {
+			newItem = menuItems.indexOf(currentItem) - 1;
+		}
+		else if(direction == 'down') {
+			newItem = menuItems.indexOf(currentItem) + 1;
+		}
+		else {
+			newItem = menuItems.indexOf(currentItem);
+		}
+
+		if(newItem < 0) {
+			newItem = menuItems.length - 1;
+		}
+		else if(newItem == menuItems.length) {
+			newItem = 0;
+		}
+
+		newItem = menuItems[newItem];
+
+		menu.childNodes[newItem].className = 'active';
+	}
+
+	function moveTargetTile(direction) {
+		let x = selTilePos[0];
+		let y = selTilePos[1];
+
+		switch(direction) {
+			case 'up':
+				if(y - 1 >= 0) {
+					y--;
+				}
+				break;
+
+			case 'down':
+				if(y + 1 < gridHeight) {
+					y++;
+				}
+				break;
+
+			case 'left':
+				if(x - 1 >= 0) {
+					x--;
+				}
+				break;
+
+			case 'right':
+				if(x + 1 < gridWidth) {
+					x++;
+				}
+				break;
+		}
+
+		if(targetTiles[x] != undefined && targetTiles[x][y] != undefined) {
+			targetTiles[selTilePos[0]][selTilePos[1]] = 2;
+			targetTiles[x][y] = 3;
+			selTilePos = [x, y];
+			drawGrid();
+		}
+	}
+
+	function actionButton() {
+		switch(states.current) {
+			case 0:
+				menuSelect();
+				break;
+
+			case 1:
+				moveSelect();
+		}
+	}
+
+	function menuSelect() {
+		let menu = document.getElementById('menu_options');
+		let currentMenu;
+
+		for(let i = 0; i < menu.childNodes.length; i++) {
+			if(menu.childNodes[i].className == 'active') {
+				currentMenu = menu.childNodes[i].id;
+				break;
+			}
+		}
+
+		switch(currentMenu) {
+			case 'move':
+				states.current = 1;
+				showMovementRange();
+				break;
+
+			case 'act':
+				console.log('mostrar menú de acciones');
+				break;
+
+			case 'wait':
+				console.log('Esperar');
+				break;
+		}
+	}
+
+	function moveSelect() {
+		prevPos = charPos;
+		charPos = selTilePos;
+		targetTiles = [];
+
+		states.current = 2;
+		states.prev = 1;
+
+		drawGrid();
+	}
+
+	function showMovementRange() {
+		targetTiles = [];
+		let range = 2; //Que lo lea después de los atributos del personaje
+		let i = 0;
+		selTilePos = charPos;
+
+		let nPoint = charPos[1] - range;
+		let sPoint = charPos[1] + range;
+		let wPoint = charPos[0] - range;
+		let ePoint = charPos[0] + range;
+
+		for(let j = wPoint; j <= ePoint; j++) {
+			targetTiles[j] = [];
+		}
+
+		for(let j = 0; j <= sPoint - nPoint; j++) {
+			let north = nPoint + j;
+			let west = selTilePos[0] - i;
+			let east = selTilePos[0] + i;
+
+			if(west != east) {
+				for(let k = west; k <= east; k++) {
+					if(k == selTilePos[0] && north == selTilePos[1]) {
+						targetTiles[k][north] = 3;
+					}
+					else {
+						targetTiles[k][north] = 2;
+					}
+				}
+			}
+			else {
+				targetTiles[west][north] = 2;
+			}
+
+			if(north >= selTilePos[1]) {
+				i--;
+			}
+			else {
+				i++;
+			}
+		}
+
+		drawGrid();
+	}
+
+	function cancelButton() {
+		console.log('cancel');
+	}
+
+
+	window.addEventListener('keydown', function(e) {
+		keyDownHandler(e);
+	}, false);
 
 	drawGrid();
 }
