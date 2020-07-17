@@ -11,12 +11,24 @@
 	<canvas id="gameCanvasIso" width="600" height="300"></canvas>
 
 	<div id="ui">
-		<div class="menu">lorem</div>
-		<div class="menu" id="actions">
-			<ul id="menu_options">
+		<div class="menu hidden" id="battleMenu">
+			<ul id="battleMenu_options">
 				<li id="move" class="active">Move</li>
 				<li id="act">Action</li>
 				<li id="wait">Wait</li>
+			</ul>
+		</div>
+		<div class="menu hidden" id="actionMenu">
+			<ul id="actionMenu_options">
+				<li id="attack" class="active">Attack</li>
+				<li id="special">Special</li>
+			</ul>
+		</div>
+		<div class="menu hidden" id="confirmMenu">
+			<span id="confirmText">Move Here?</span>
+			<ul id="confirmMenu_options">
+				<li id="confirm" class="active">Yes</li>
+				<li id="cancel">No</li>
 			</ul>
 		</div>
 	</div>

@@ -55,10 +55,18 @@ window.onload = function() {
 		current: 0,
 		prev: 0,
 		battleMenu: 0,
-		move: 1
+		move: 1,
+		action: 2,
+		confirm: 3,
+		attack: 4
 	}
 
-	let targetTiles = [];
+	let movementTiles = [];
+
+	let movementRange = 2;
+	let attackRange = 1;
+	let moved = 0;
+	let acted = 0;
 
 
 	function drawGrid() {
@@ -69,8 +77,8 @@ window.onload = function() {
 			for(let j = 0; j < gridWidth; j++) {
 				placeTile(grid[i][j], j, i);
 
-				if(targetTiles[j] != undefined && targetTiles[j][i] != undefined) {
-					placeTile(targetTiles[j][i], j, i);
+				if(movementTiles[j] != undefined && movementTiles[j][i] != undefined) {
+					placeTile(movementTiles[j][i], j, i);
 				}
 
 				if(charPos[1] == i && charPos[0] == j) {
@@ -81,24 +89,54 @@ window.onload = function() {
 	}
 
 	function menuHandler(state) {
-		hideMenus();
+		//hideMenus();
 		switch(state) {
-			case 0:
-				showMenu('actions');
+			case states.battleMenu:
+				showMenu('battleMenu');
 				break;
+
+			case states.action:
+				showMenu('actionMenu');
+				break;
+
+			case states.confirm:
+				showMenu('confirmMenu');
 		}
 	}
 
 	function hideMenus() {
 		var menus = document.getElementsByClassName('menu');
 		for(let i = 0; i < menus.length; i++) {
+			menus[i].classList.remove('off');
 			menus[i].classList.add('hidden');
 		}
 	}
 
 	function showMenu(id) {
-		var menu = document.getElementById(id);
+		switch(id) {
+			case 'battleMenu':
+				if(moved > 0) {
+					let option = document.getElementById('move');
+					option.classList.add('off');
+				}
+				if(acted > 0) {
+					let option = document.getElementById('act');
+					option.classList.add('off');
+				}
+				break;
+		}
+
+		let menus = document.getElementsByClassName('menu');
+
+		for(let i = 0; i < menus.length; i++) {
+			if(!menus[i].classList.contains('hidden')) {
+				menus[i].classList.add('off');
+			}
+		}
+
+		let menu = document.getElementById(id);
 		menu.classList.remove('hidden');
+		menu.classList.remove('off');
 	}
 
 	function placeTile(tileKind, x, y) {
@@ -198,18 +236,30 @@ window.onload = function() {
 
 	function move(direction){
 		switch(states.current) {
-			case 0:
-				moveMenu(direction);
+			case states.battleMenu:
+				moveMenu('battleMenu', direction);
 				break;
 
-			case 1:
+			case states.move:
 				moveTargetTile(direction);
 				break;
+
+			case states.action:
+				moveMenu('actionMenu', direction);
+				break;
+
+			case states.attack:
+				moveTargetTile(direction);
+				break;
+
+			case states.confirm:
+				moveMenu('confirmMenu', direction);
 		}
 	}
 
-	function moveMenu(direction) {
-		let menu = document.getElementById('menu_options');
+	function moveMenu(menuName, direction) {
+		let menuOptions = menuName + '_options';
+		let menu = document.getElementById(menuOptions);
 		let menuItems = [];
 		let currentItem;
 		let newItem;
@@ -217,9 +267,9 @@ window.onload = function() {
 		for(let i = 0; i < menu.childNodes.length; i++) {
 			if(menu.childNodes[i].tagName == "LI") {
 				menuItems.push(i);
-				if(menu.childNodes[i].className == 'active') {
+				if(menu.childNodes[i].classList.contains('active')) {
 					currentItem = i;
-					menu.childNodes[i].className = null;
+					menu.childNodes[i].classList.remove('active');
 				}
 			}
 		}
@@ -243,7 +293,7 @@ window.onload = function() {
 
 		newItem = menuItems[newItem];
 
-		menu.childNodes[newItem].className = 'active';
+		menu.childNodes[newItem].classList.add('active');
 	}
 
 	function moveTargetTile(direction) {
@@ -276,9 +326,9 @@ window.onload = function() {
 				break;
 		}
 
-		if(targetTiles[x] != undefined && targetTiles[x][y] != undefined) {
-			targetTiles[selTilePos[0]][selTilePos[1]] = 2;
-			targetTiles[x][y] = 3;
+		if(movementTiles[x] != undefined && movementTiles[x][y] != undefined) {
+			movementTiles[selTilePos[0]][selTilePos[1]] = 2;
+			movementTiles[x][y] = 3;
 			selTilePos = [x, y];
 			drawGrid();
 		}
@@ -286,21 +336,41 @@ window.onload = function() {
 
 	function actionButton() {
 		switch(states.current) {
-			case 0:
-				menuSelect();
+			case states.battleMenu:
+				menuSelect('battleMenu');
 				break;
 
-			case 1:
-				moveSelect();
+			case states.move:
+				states.prev = states.move;
+				confirmAction('Move');
+				//moveSelect();
+				break;
+
+			case states.action:
+				menuSelect('actionMenu');
+				break;
+
+			case states.attack:
+				states.prev = states.attack;
+				confirmAction('Attack');
+				break;
+
+			case states.confirm:
+				menuSelect('confirmMenu');
+				//if(states.prev == states.move) {
+				//	moveSelect();
+				//}
+				break;
 		}
 	}
 
-	function menuSelect() {
-		let menu = document.getElementById('menu_options');
+	function menuSelect(menuName) {
+		let menuOptions = menuName + '_options';
+		let menu = document.getElementById(menuOptions);
 		let currentMenu;
 
 		for(let i = 0; i < menu.childNodes.length; i++) {
-			if(menu.childNodes[i].className == 'active') {
+			if(menu.childNodes[i].classList && menu.childNodes[i].classList.contains('active') && !menu.childNodes[i].classList.contains('off')) {
 				currentMenu = menu.childNodes[i].id;
 				break;
 			}
@@ -308,36 +378,105 @@ window.onload = function() {
 
 		switch(currentMenu) {
 			case 'move':
-				states.current = 1;
-				showMovementRange();
+				states.current = states.move;
+				hideMenus();
+				showRange('move');
 				break;
 
 			case 'act':
-				console.log('mostrar menú de acciones');
+				states.current = states.action;
+				menuHandler(states.current);
+				break;
+
+			case 'attack':
+				states.current = states.attack;
+				states.prev = states.action;
+				hideMenus();
+				showRange('attack');
+				break;
+
+			case 'special':
+				console.log('special');
 				break;
 
 			case 'wait':
 				console.log('Esperar');
 				break;
+
+			case 'cancel':
+				if(states.prev == states.move) {
+					states.current = states.move;
+					states.prev = states.battleMenu;
+					//charPos = prevPos;
+					hideMenus();
+					showRange('move');
+				}
+				break;
+
+			case 'confirm':
+				if(states.prev == states.move) {
+					moveSelect();
+				}
+				else if(states.prev == states.attack) {
+					attackSelect();
+				}
 		}
+	}
+
+	function confirmAction(action) {
+		states.current = states.confirm;
+		menuHandler(states.current);
 	}
 
 	function moveSelect() {
 		prevPos = charPos;
 		charPos = selTilePos;
-		targetTiles = [];
+		movementTiles = [];
 
-		states.current = 2;
-		states.prev = 1;
+		states.current = states.battleMenu;
+		states.prev = states.battleMenu;
+
+		moved = 1;
+
+		hideMenus();
+
 
 		drawGrid();
 	}
 
-	function showMovementRange() {
-		targetTiles = [];
-		let range = 2; //Que lo lea después de los atributos del personaje
-		let i = 0;
+	function attackSelect() {
+		console.log('attack!');
+		movementTiles = [];
+
+		states.current = states.battleMenu;
+		states.prev = states.battleMenu;
+
+		acted = 1;
+
+		hideMenus();
+
+		drawGrid();
+	}
+
+	function showRange(kind) {
+		movementTiles = [];
 		selTilePos = charPos;
+		let i = 0;
+		let targetTiles = [];
+		let range;
+		let tile;
+
+		switch(kind) {
+			case 'move':
+				range = movementRange;
+				tile = 2;
+				break;
+
+			case 'attack':
+				range = attackRange;
+				tile = 2;
+				break;
+		}
 
 		let nPoint = charPos[1] - range;
 		let sPoint = charPos[1] + range;
@@ -359,12 +498,12 @@ window.onload = function() {
 						targetTiles[k][north] = 3;
 					}
 					else {
-						targetTiles[k][north] = 2;
+						targetTiles[k][north] = tile;
 					}
 				}
 			}
 			else {
-				targetTiles[west][north] = 2;
+				targetTiles[west][north] = tile;
 			}
 
 			if(north >= selTilePos[1]) {
@@ -375,11 +514,38 @@ window.onload = function() {
 			}
 		}
 
+		movementTiles = targetTiles;
+
 		drawGrid();
 	}
 
 	function cancelButton() {
-		console.log('cancel');
+		switch(states.prev) {
+			case states.move:
+				states.current = states.move;
+				states.prev = states.battleMenu;
+				//charPos = prevPos;
+				hideMenus();
+				showRange('move');
+				break;
+
+			case states.battleMenu:
+				movementTiles = [];
+				states.current = states.battleMenu;
+				states.prev = states.battleMenu;
+				hideMenus();
+				break;
+
+			case states.action:
+				states.current = states.action;
+				states.prev = states.battleMenu;
+				movementTiles = [];
+				showMenu('battleMenu');
+				showMenu('actionMenu');
+				break;
+		}
+
+		drawGrid();
 	}
 
 
