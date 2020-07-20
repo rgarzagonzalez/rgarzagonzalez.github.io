@@ -34,7 +34,6 @@ window.onload = function() {
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
 
-	let charPos = [4, 1];
 	let selTilePos = [];
 	let prevPos = [];
 
@@ -54,19 +53,116 @@ window.onload = function() {
 	let states = {
 		current: 0,
 		prev: 0,
-		battleMenu: 0,
-		move: 1,
-		action: 2,
-		confirm: 3,
-		attack: 4
+		idle: 0,
+		battleMenu: 1,
+		move: 2,
+		action: 3,
+		confirm: 4,
+		attack: 5
 	}
 
 	let movementTiles = [];
 
+	let charPos = [4, 1];
 	let movementRange = 2;
 	let attackRange = 1;
 	let moved = 0;
 	let acted = 0;
+
+	let char1 = {
+		name: 'Character_1',
+		hp: 100,
+		spd: 5,
+		ct: 0,
+		cct: 0,
+		charPos: [4, 1],
+		movementRange: 2,
+		attackRange: 1,
+		moved: 0,
+		acted: 0
+	};
+
+	let char2 = {
+		name: 'Character_2',
+		hp: 80,
+		spd: 8,
+		ct: 0,
+		cct: 0,
+		charPos: [2, 2],
+		movementRange: 2,
+		attackRange: 1,
+		moved: 0,
+		acted: 0
+	};
+
+	let char3 = {
+		name: 'Character_3',
+		hp: 120,
+		spd: 3,
+		ct: 0,
+		cct: 0,
+		charPos: [2, 4],
+		movementRange: 2,
+		attackRange: 1,
+		moved: 0,
+		acted: 0
+	};
+
+	let characters = [char1, char2, char3];
+
+	let currentChar = '';
+
+	let turnList = [];
+
+	let turno = [];
+
+	//console.log(currentChar.charPos);
+
+
+	function loop() {
+		ctCharge();
+		//turn();
+		//setTimeout(loop, 1000/60);
+		//turn();
+		//loop();
+	}
+
+
+	function ctCharge() {
+		//console.log('cargando');
+		for(let i = 0; i < characters.length; i++) {
+			characters[i].ct += characters[i].spd;
+
+			if(characters[i].ct >= 100) {
+				characters[i].ct = 0;
+				turno.push(i);
+			}
+		}
+
+		checkTurn();
+	}
+
+
+	function checkTurn() {
+		if(turno.length > 0) {
+			//console.log('Longitud = '+ turno.length +', activar turno');
+			turn();
+		}
+
+		else {
+			//console.log('Longitud = 0, no hay turno');
+			states.current = states.idle;
+			setTimeout(loop, 1000/60);
+		}
+	}
+
+
+	function turn(){
+		//console.log('inicia el turno');
+		currentChar = characters[turno[0]];
+		states.current = states.battleMenu;
+		drawGrid();
+	}
 
 
 	function drawGrid() {
@@ -81,12 +177,43 @@ window.onload = function() {
 					placeTile(movementTiles[j][i], j, i);
 				}
 
-				if(charPos[1] == i && charPos[0] == j) {
-					placeChar(j, i);
+				for(let k = 0; k < characters.length; k++) {
+					if(characters[k].charPos[1] == i && characters[k].charPos[0] == j) {
+						placeChar(j, i);
+					}
 				}
 			}
 		}
 	}
+
+
+	function battleOrder() {
+		turnList = [];
+		let list = '';
+		let i = 0;
+
+		while(turnList.length < 20) {
+			for(let i = 0; i < characters.length; i++) {
+				if(characters[i].hp > 0) {
+					characters[i].cct += characters[i].spd;
+				}
+
+				if(characters[i].cct >= 100) {
+					turnList.push(characters[i].name);
+					characters[i].cct = 0;
+				}
+			}
+			i++;
+		}
+
+		for(let i = 0; i < turnList.length; i++) {
+			list += '<div>'+(i + 1)+': '+ turnList[i] +'</div>';
+		}
+
+		document.getElementById('turnList').innerHTML = list;
+
+	}
+
 
 	function menuHandler(state) {
 		//hideMenus();
@@ -104,6 +231,7 @@ window.onload = function() {
 		}
 	}
 
+
 	function hideMenus() {
 		var menus = document.getElementsByClassName('menu');
 		for(let i = 0; i < menus.length; i++) {
@@ -112,14 +240,15 @@ window.onload = function() {
 		}
 	}
 
+
 	function showMenu(id) {
 		switch(id) {
 			case 'battleMenu':
-				if(moved > 0) {
+				if(currentChar.moved > 0) {
 					let option = document.getElementById('move');
 					option.classList.add('off');
 				}
-				if(acted > 0) {
+				if(currentChar.acted > 0) {
 					let option = document.getElementById('act');
 					option.classList.add('off');
 				}
@@ -138,6 +267,7 @@ window.onload = function() {
 		menu.classList.remove('hidden');
 		menu.classList.remove('off');
 	}
+
 
 	function placeTile(tileKind, x, y) {
 		let tile;
@@ -176,6 +306,7 @@ window.onload = function() {
 		
 	}
 
+
 	function placeChar(x, y) {
 		//place in cart grid
 		cCart.beginPath();
@@ -191,6 +322,7 @@ window.onload = function() {
 		cIso.fill();
 	}
 
+
 	function cartToIso(x, y) {
 		let cordsIso = [];
 
@@ -201,6 +333,7 @@ window.onload = function() {
 
 		return cordsIso;
 	}
+
 
 	function keyDownHandler(e) {
 		switch(e.keyCode) {
@@ -234,6 +367,7 @@ window.onload = function() {
 		}
 	}
 
+
 	function move(direction){
 		switch(states.current) {
 			case states.battleMenu:
@@ -256,6 +390,7 @@ window.onload = function() {
 				moveMenu('confirmMenu', direction);
 		}
 	}
+
 
 	function moveMenu(menuName, direction) {
 		let menuOptions = menuName + '_options';
@@ -296,6 +431,7 @@ window.onload = function() {
 		menu.childNodes[newItem].classList.add('active');
 	}
 
+
 	function moveTargetTile(direction) {
 		let x = selTilePos[0];
 		let y = selTilePos[1];
@@ -334,6 +470,7 @@ window.onload = function() {
 		}
 	}
 
+
 	function actionButton() {
 		switch(states.current) {
 			case states.battleMenu:
@@ -364,6 +501,7 @@ window.onload = function() {
 		}
 	}
 
+
 	function menuSelect(menuName) {
 		let menuOptions = menuName + '_options';
 		let menu = document.getElementById(menuOptions);
@@ -379,6 +517,7 @@ window.onload = function() {
 		switch(currentMenu) {
 			case 'move':
 				states.current = states.move;
+				states.prev = states.battleMenu;
 				hideMenus();
 				showRange('move');
 				break;
@@ -401,15 +540,30 @@ window.onload = function() {
 
 			case 'wait':
 				console.log('Esperar');
+				currentChar.moved = 0;
+				currentChar.acted = 0;
+				currentChar = '';
+				document.getElementById('move').classList.remove('off');
+				document.getElementById('act').classList.remove('off');
+				hideMenus();
+				turno.shift();
+				checkTurn();
 				break;
 
 			case 'cancel':
 				if(states.prev == states.move) {
 					states.current = states.move;
 					states.prev = states.battleMenu;
-					//charPos = prevPos;
 					hideMenus();
 					showRange('move');
+				}
+				else if(states.prev == states.attack) {
+					states.current = states.action;
+					hideMenus();
+					movementTiles = [];
+					showMenu('battleMenu');
+					showMenu('actionMenu');
+					drawGrid();
 				}
 				break;
 
@@ -423,44 +577,58 @@ window.onload = function() {
 		}
 	}
 
+
 	function confirmAction(action) {
+		let confirmText = "";
+		let textSpan = document.getElementById('confirmText');
+
+		confirmText = action == 'Move' ? "Move here?" : "Perform this action?";
+
+		textSpan.innerHTML = confirmText;
+
 		states.current = states.confirm;
 		menuHandler(states.current);
 	}
 
+
 	function moveSelect() {
-		prevPos = charPos;
-		charPos = selTilePos;
+		prevPos = currentChar.charPos;
+		currentChar.charPos = selTilePos;
 		movementTiles = [];
 
 		states.current = states.battleMenu;
 		states.prev = states.battleMenu;
 
-		moved = 1;
+		currentChar.moved = 1;
 
 		hideMenus();
 
-
 		drawGrid();
 	}
+
 
 	function attackSelect() {
-		console.log('attack!');
+		console.log('Revisar si hay un blanco en ' + selTilePos);
+		console.log('Si lo hay, determinar si el golpe conectó');
+		console.log('Si conectó, determinar cuanto daño se hizo');
+		console.log('De cualquier manera, mostrar la animación');
+
 		movementTiles = [];
 
 		states.current = states.battleMenu;
 		states.prev = states.battleMenu;
 
-		acted = 1;
+		currentChar.acted = 1;
 
 		hideMenus();
 
 		drawGrid();
 	}
+
 
 	function showRange(kind) {
 		movementTiles = [];
-		selTilePos = charPos;
+		selTilePos = currentChar.charPos;
 		let i = 0;
 		let targetTiles = [];
 		let range;
@@ -478,10 +646,10 @@ window.onload = function() {
 				break;
 		}
 
-		let nPoint = charPos[1] - range;
-		let sPoint = charPos[1] + range;
-		let wPoint = charPos[0] - range;
-		let ePoint = charPos[0] + range;
+		let nPoint = currentChar.charPos[1] - range;
+		let sPoint = currentChar.charPos[1] + range;
+		let wPoint = currentChar.charPos[0] - range;
+		let ePoint = currentChar.charPos[0] + range;
 
 		for(let j = wPoint; j <= ePoint; j++) {
 			targetTiles[j] = [];
@@ -519,12 +687,12 @@ window.onload = function() {
 		drawGrid();
 	}
 
+
 	function cancelButton() {
 		switch(states.prev) {
 			case states.move:
 				states.current = states.move;
 				states.prev = states.battleMenu;
-				//charPos = prevPos;
 				hideMenus();
 				showRange('move');
 				break;
@@ -537,6 +705,8 @@ window.onload = function() {
 				break;
 
 			case states.action:
+			case states.attack:
+				hideMenus();
 				states.current = states.action;
 				states.prev = states.battleMenu;
 				movementTiles = [];
@@ -548,10 +718,44 @@ window.onload = function() {
 		drawGrid();
 	}
 
-
 	window.addEventListener('keydown', function(e) {
 		keyDownHandler(e);
 	}, false);
 
+	battleOrder();
+
 	drawGrid();
+
+	loop();
+
+	debug();
+
+	function debug() {
+		document.getElementById('currentState').innerHTML = states.current;
+		document.getElementById('previousState').innerHTML = states.prev;
+
+		document.getElementById('char1Name').innerHTML = char1.name;
+		document.getElementById('char1Ct').innerHTML = char1.ct;
+		document.getElementById('char1Acted').innerHTML = char1.acted;
+		document.getElementById('char1Moved').innerHTML = char1.moved;
+
+		document.getElementById('char2Name').innerHTML = char2.name;
+		document.getElementById('char2Ct').innerHTML = char2.ct;
+		document.getElementById('char2Acted').innerHTML = char2.acted;
+		document.getElementById('char2Moved').innerHTML = char2.moved;
+
+		document.getElementById('char3Name').innerHTML = char3.name;
+		document.getElementById('char3Ct').innerHTML = char3.ct;
+		document.getElementById('char3Acted').innerHTML = char3.acted;
+		document.getElementById('char3Moved').innerHTML = char3.moved;
+
+		if(currentChar == '') {
+			document.getElementById('whoseCurrent').innerHTML = 'None';
+		}
+		else {
+			document.getElementById('whoseCurrent').innerHTML = currentChar.name;
+		}
+
+		setTimeout(debug, 1000/60);
+	}
 }

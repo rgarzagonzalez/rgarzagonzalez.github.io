@@ -2,6 +2,7 @@
 	width: 200px;
 	background-color: #CCCC00;
 	padding:10px;
+	float:left;
 }
 
 .menu ul {
@@ -24,4 +25,17 @@
 
 .off {
 	opacity: 0.5;
+}
+
+#turnList {
+	width: 100px;
+	height: 100px;
+	border: 1px solid black;
+	float:left;
+	padding:20px;
+	overflow:scroll;
+}
+
+.current {
+	background-color: rgba(255,0,0,0.5);
 }
