@@ -17,6 +17,15 @@ window.onload = function() {
 	let activeTile = new Image();
 	activeTile.src = 'img/activeTile.png';
 
+	let sprite_01 = new Image();
+	sprite_01.src = 'img/sprite_01.png';
+
+	let sprite_02 = new Image();
+	sprite_02.src = 'img/sprite_02.png';
+
+	let sprite_03 = new Image();
+	sprite_03.src = 'img/sprite_03.png';
+
 	let tileWidth = greenTile.width;
 	let tileHeight = greenTile.height;
 
@@ -71,6 +80,7 @@ window.onload = function() {
 
 	let char1 = {
 		name: 'Character_1',
+		sprite: sprite_01,
 		hp: 100,
 		spd: 5,
 		ct: 0,
@@ -84,6 +94,7 @@ window.onload = function() {
 
 	let char2 = {
 		name: 'Character_2',
+		sprite: sprite_02,
 		hp: 80,
 		spd: 8,
 		ct: 0,
@@ -97,11 +108,12 @@ window.onload = function() {
 
 	let char3 = {
 		name: 'Character_3',
+		sprite: sprite_03,
 		hp: 120,
 		spd: 3,
 		ct: 0,
 		cct: 0,
-		charPos: [2, 4],
+		charPos: [1, 3],
 		movementRange: 2,
 		attackRange: 1,
 		moved: 0,
@@ -134,7 +146,7 @@ window.onload = function() {
 			characters[i].ct += characters[i].spd;
 
 			if(characters[i].ct >= 100) {
-				characters[i].ct = 0;
+				characters[i].ct = 100;
 				turno.push(i);
 			}
 		}
@@ -179,7 +191,7 @@ window.onload = function() {
 
 				for(let k = 0; k < characters.length; k++) {
 					if(characters[k].charPos[1] == i && characters[k].charPos[0] == j) {
-						placeChar(j, i);
+						placeChar(j, i, k);
 					}
 				}
 			}
@@ -307,7 +319,7 @@ window.onload = function() {
 	}
 
 
-	function placeChar(x, y) {
+	function placeChar(x, y, char) {
 		//place in cart grid
 		cCart.beginPath();
 		cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
@@ -316,10 +328,13 @@ window.onload = function() {
 
 		//place in iso grid
 		let cordsIso = cartToIso(x, y);
+		let sprite = characters[char].sprite;
 		cIso.beginPath();
 		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
 		cIso.fillStyle = 'yellow';
 		cIso.fill();
+
+		cIso.drawImage(sprite, 0, 0, 105, 130, cordsIso[0], cordsIso[1] - 95, 105, 130);
 	}
 
 
@@ -542,6 +557,7 @@ window.onload = function() {
 				console.log('Esperar');
 				currentChar.moved = 0;
 				currentChar.acted = 0;
+				currentChar.ct = 0;
 				currentChar = '';
 				document.getElementById('move').classList.remove('off');
 				document.getElementById('act').classList.remove('off');
