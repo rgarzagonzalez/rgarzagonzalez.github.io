@@ -5,6 +5,9 @@ window.onload = function() {
 	let canvasIso = document.getElementById('gameCanvasIso');
 	let cIso = canvasIso.getContext('2d');
 
+	let canvasChars = document.getElementById('gameCanvasIsoChars');
+	let cChars = canvasChars.getContext('2d');
+
 	let greenTile = new Image();
 	greenTile.src = 'img/greenTile.png';
 
@@ -81,11 +84,19 @@ window.onload = function() {
 	let char1 = {
 		name: 'Character_1',
 		sprite: sprite_01,
+		width: 108,
+		height: 130,
+		offsetX: 0,
+		offsetY: -95,
+		frame: 0,
+		currentAnimation: 0,
+		currentAnimationFrames: 8,
+		maxHp: 100,
 		hp: 100,
 		spd: 5,
 		ct: 0,
 		cct: 0,
-		charPos: [4, 1],
+		charPos: [3, 3],
 		movementRange: 2,
 		attackRange: 1,
 		moved: 0,
@@ -95,11 +106,19 @@ window.onload = function() {
 	let char2 = {
 		name: 'Character_2',
 		sprite: sprite_02,
-		hp: 80,
+		width: 105,
+		height: 130,
+		offsetX: 0,
+		offsetY: -95,
+		frame: 0,
+		currentAnimation: 0,
+		currentAnimationFrames: 1,
+		maxHp: 100,
+		hp: 100,
 		spd: 8,
 		ct: 0,
 		cct: 0,
-		charPos: [2, 2],
+		charPos: [1, 3],
 		movementRange: 2,
 		attackRange: 1,
 		moved: 0,
@@ -109,11 +128,19 @@ window.onload = function() {
 	let char3 = {
 		name: 'Character_3',
 		sprite: sprite_03,
-		hp: 120,
+		width: 105,
+		height: 130,
+		offsetX: 0,
+		offsetY: -95,
+		frame: 0,
+		currentAnimation: 0,
+		currentAnimationFrames: 1,
+		maxHp: 100,
+		hp: 100,
 		spd: 3,
 		ct: 0,
 		cct: 0,
-		charPos: [1, 3],
+		charPos: [2, 3],
 		movementRange: 2,
 		attackRange: 1,
 		moved: 0,
@@ -127,6 +154,8 @@ window.onload = function() {
 	let turnList = [];
 
 	let turno = [];
+
+	let characterDrawOrder = [];
 
 	//console.log(currentChar.charPos);
 
@@ -178,9 +207,13 @@ window.onload = function() {
 
 
 	function drawGrid() {
-		menuHandler(states.current);
 		cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
 		cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
+
+		characterDrawOrder = [];
+
+		menuHandler(states.current);
+
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {
 				placeTile(grid[i][j], j, i);
@@ -191,11 +224,58 @@ window.onload = function() {
 
 				for(let k = 0; k < characters.length; k++) {
 					if(characters[k].charPos[1] == i && characters[k].charPos[0] == j) {
-						placeChar(j, i, k);
+						characterDrawOrder.push(k);
 					}
 				}
 			}
 		}
+
+		drawCharacters();
+	}
+
+
+	function drawCharacters() {
+		cChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
+
+		for(let i = 0; i < characterDrawOrder.length; i++) {
+			let char = characterDrawOrder[i];
+			let x = characters[char].charPos[0];
+			let y = characters[char].charPos[1];
+			let width = characters[char].width;
+			let height = characters[char].height;
+			let offsetX = characters[char].offsetX;
+			let offsetY = characters[char].offsetY;
+			let currentFrame = characters[char].frame;
+			let column = characters[char].currentAnimation;
+
+			let cordsIso = cartToIso(x, y);
+			let sprite = characters[char].sprite;
+
+			//colocar marca en retícula cartesiana
+			cCart.beginPath();
+			cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
+			cCart.fillStyle = 'yellow';
+			cCart.fill();
+
+			//dibujar personajes en retícula isométrica
+			cChars.drawImage(sprite, currentFrame * width, column * height, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+		}
+	}
+
+
+	function animate() {
+		drawCharacters();
+
+		for(let i = 0; i < characters.length; i++) {
+			characters[i].frame ++;
+			if(characters[i].frame >= characters[i].currentAnimationFrames) {
+				characters[i].frame = 0;
+			}
+		}
+
+		//console.log('dibujar frame');
+
+		setTimeout(animate, 1000/14);
 	}
 
 
@@ -316,25 +396,6 @@ window.onload = function() {
 		//Place Iso tile
 		cIso.drawImage(tile, cordsIso[0], cordsIso[1], tileWidth, tileHeight);
 		
-	}
-
-
-	function placeChar(x, y, char) {
-		//place in cart grid
-		cCart.beginPath();
-		cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
-		cCart.fillStyle = 'yellow';
-		cCart.fill();
-
-		//place in iso grid
-		let cordsIso = cartToIso(x, y);
-		let sprite = characters[char].sprite;
-		cIso.beginPath();
-		cIso.arc(cordsIso[0] + (tileWidth / 2), cordsIso[1] + (tileHeight / 2), 10, 0 , 2 * Math.PI, false);
-		cIso.fillStyle = 'yellow';
-		cIso.fill();
-
-		cIso.drawImage(sprite, 0, 0, 105, 130, cordsIso[0], cordsIso[1] - 95, 105, 130);
 	}
 
 
@@ -625,8 +686,18 @@ window.onload = function() {
 
 	function attackSelect() {
 		console.log('Revisar si hay un blanco en ' + selTilePos);
-		console.log('Si lo hay, determinar si el golpe conectó');
-		console.log('Si conectó, determinar cuanto daño se hizo');
+		let target = checkTile(selTilePos, 'target');
+		
+		if(target[0] == true) {
+			console.log('Hay un blanco, determinar si el golpe conecta (por ahora, siempre va a conectar)');
+			console.log('Si conectó, determinar cuanto daño se hizo (por ahora, siempre bajará 5)');
+			characters[target[1]].hp -= 5;
+		}
+		else {
+			console.log('No hay blanco');
+		}
+
+		
 		console.log('De cualquier manera, mostrar la animación');
 
 		movementTiles = [];
@@ -639,6 +710,25 @@ window.onload = function() {
 		hideMenus();
 
 		drawGrid();
+	}
+
+
+	function checkTile(tilePos, type) {
+		console.log('revisando baldosa ' + tilePos);
+		let result = [false];
+		switch(type) {
+			case 'target':
+				for(let i = 0; i < characters.length; i++) {
+					if(characters[i].charPos[0] == tilePos[0] && characters[i].charPos[1] == tilePos[1]) {
+						//Se encontró un blanco
+						result = [true, i];
+						return result;
+						break;
+					}
+				}
+				return result;
+				break;
+		}
 	}
 
 
@@ -740,27 +830,30 @@ window.onload = function() {
 
 	battleOrder();
 
-	drawGrid();
-
 	loop();
 
 	debug();
+
+	animate();
 
 	function debug() {
 		document.getElementById('currentState').innerHTML = states.current;
 		document.getElementById('previousState').innerHTML = states.prev;
 
 		document.getElementById('char1Name').innerHTML = char1.name;
+		document.getElementById('char1Hp').innerHTML = char1.hp;
 		document.getElementById('char1Ct').innerHTML = char1.ct;
 		document.getElementById('char1Acted').innerHTML = char1.acted;
 		document.getElementById('char1Moved').innerHTML = char1.moved;
 
 		document.getElementById('char2Name').innerHTML = char2.name;
+		document.getElementById('char2Hp').innerHTML = char2.hp;
 		document.getElementById('char2Ct').innerHTML = char2.ct;
 		document.getElementById('char2Acted').innerHTML = char2.acted;
 		document.getElementById('char2Moved').innerHTML = char2.moved;
 
 		document.getElementById('char3Name').innerHTML = char3.name;
+		document.getElementById('char3Hp').innerHTML = char3.hp;
 		document.getElementById('char3Ct').innerHTML = char3.ct;
 		document.getElementById('char3Acted').innerHTML = char3.acted;
 		document.getElementById('char3Moved').innerHTML = char3.moved;

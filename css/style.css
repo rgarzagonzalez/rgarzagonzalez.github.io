@@ -1,3 +1,16 @@
+#isoCanvases {
+	position:relative;
+	width: 600px;
+	height: 300px;
+	float: right;
+}
+
+#isoCanvases canvas {
+	position:absolute;
+	top:0;
+	left:0;
+}
+
 .menu {
 	width: 200px;
 	background-color: #CCCC00;

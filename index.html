@@ -8,9 +8,12 @@
 </head>
 <body>
 	<canvas id="gameCanvasCart" width="600" height="300"></canvas>
-	<canvas id="gameCanvasIso" width="600" height="300"></canvas>
+	<div id="isoCanvases">
+		<canvas id="gameCanvasIso" width="600" height="300"></canvas>
+		<canvas id="gameCanvasIsoChars" width="600" height="300"></canvas>
+	</div>
 
-	<div id="ui">
+	<div id="debug">
 		<div style="border:1px solid red; width:100px; float:left;">
 			States:<br>
 			0: Idle<br>
@@ -27,18 +30,21 @@
 
 		<div class="debug" id="Character_1" style="border:1px solid red; width:100px; float:left;">
 			<div id="char1Name"></div>
+			<p>HP: <span id="char1Hp"></span></p>
 			<p>CT: <span id="char1Ct"></span></p>
 			<p>Acted: <span id="char1Acted"></span></p>
 			<p>Moved: <span id="char1Moved"></span></p>
 		</div>
 		<div class="debug" id="Character_2" style="border:1px solid red; width:100px; float:left;">
 			<div id="char2Name"></div>
+			<p>HP: <span id="char2Hp"></span></p>
 			<p>CT: <span id="char2Ct"></span></p>
 			<p>Acted: <span id="char2Acted"></span></p>
 			<p>Moved: <span id="char2Moved"></span></p>
 		</div>
 		<div class="debug" id="Character_3" style="border:1px solid red; width:100px; float:left;">
 			<div id="char3Name"></div>
+			<p>HP: <span id="char3Hp"></span></p>
 			<p>CT: <span id="char3Ct"></span></p>
 			<p>Acted: <span id="char3Acted"></span></p>
 			<p>Moved: <span id="char3Moved"></span></p>
@@ -47,7 +53,9 @@
 		<div style="border:1px solid red; width:100px; float:left;">
 			Current Character: <span id="whoseCurrent"></span>
 		</div>
+	</div>
 
+	<div id="ui">
 		<div id="turnList"></div>
 
 		<div class="menu hidden" id="battleMenu">
