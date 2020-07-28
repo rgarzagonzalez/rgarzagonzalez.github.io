@@ -10,43 +10,63 @@ window.onload = function() {
 
 	let greenTile = new Image();
 	greenTile.src = 'img/greenTile.png';
+	greenTile.addEventListener('load', assetLoaded);
 
 	let redTile = new Image();
 	redTile.src = 'img/redTile.png';
+	redTile.addEventListener('load', assetLoaded);
 
 	let walkableTile = new Image();
 	walkableTile.src = 'img/walkableTile.png';
+	walkableTile.addEventListener('load', assetLoaded);
 
 	let activeTile = new Image();
 	activeTile.src = 'img/activeTile.png';
+	activeTile.addEventListener('load', assetLoaded);
 
 	let sprite_01 = new Image();
 	sprite_01.src = 'img/sprite_01.png';
+	sprite_01.addEventListener('load', assetLoaded);
 
 	let sprite_02 = new Image();
 	sprite_02.src = 'img/sprite_02.png';
+	sprite_02.addEventListener('load', assetLoaded);
 
 	let sprite_03 = new Image();
 	sprite_03.src = 'img/sprite_03.png';
+	sprite_03.addEventListener('load', assetLoaded);
+
+	let sprite_04 = new Image();
+	sprite_04.src = 'img/sprite_04.png';
+	sprite_04.addEventListener('load', assetLoaded);
+
+	let assets = 0;
 
 	let tileWidth = greenTile.width;
 	let tileHeight = greenTile.height;
 
-	let gridWidth = 5;
-	let gridHeight = 5;
+	let portraitSize = 120;
+
+	let gridWidth = 10;
+	let gridHeight = 10;
 
 	let grid = [
-		[0, 0, 1, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0]
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	];
 
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
 
-	let selTilePos = [];
+	//let currentTile = [];
 	let prevPos = [];
 
 	let Keys = {
@@ -70,19 +90,19 @@ window.onload = function() {
 		move: 2,
 		action: 3,
 		confirm: 4,
-		attack: 5
+		attack: 5,
+		explore: 6,
+		showOtherRange: 7
 	}
 
 	let movementTiles = [];
 
 	let charPos = [4, 1];
-	let movementRange = 2;
-	let attackRange = 1;
 	let moved = 0;
 	let acted = 0;
 
 	let char1 = {
-		name: 'Character_1',
+		name: 'Monk',
 		sprite: sprite_01,
 		width: 108,
 		height: 130,
@@ -91,8 +111,12 @@ window.onload = function() {
 		frame: 0,
 		currentAnimation: 0,
 		currentAnimationFrames: 8,
+		currentAnimationHolds: 1,
+		holds: 0,
 		maxHp: 100,
 		hp: 100,
+		maxAp: 50,
+		ap: 50,
 		spd: 5,
 		ct: 0,
 		cct: 0,
@@ -104,21 +128,25 @@ window.onload = function() {
 	};
 
 	let char2 = {
-		name: 'Character_2',
+		name: 'Fighter',
 		sprite: sprite_02,
-		width: 105,
-		height: 130,
+		width: 108,
+		height: 150,
 		offsetX: 0,
-		offsetY: -95,
+		offsetY: -115,
 		frame: 0,
 		currentAnimation: 0,
-		currentAnimationFrames: 1,
-		maxHp: 100,
-		hp: 100,
+		currentAnimationFrames: 9,
+		currentAnimationHolds: 4,
+		holds: 0,
+		maxHp: 150,
+		hp: 45,
+		maxAp: 35,
+		ap: 30,
 		spd: 8,
 		ct: 0,
 		cct: 0,
-		charPos: [1, 3],
+		charPos: [4, 5],
 		movementRange: 2,
 		attackRange: 1,
 		moved: 0,
@@ -126,17 +154,21 @@ window.onload = function() {
 	};
 
 	let char3 = {
-		name: 'Character_3',
+		name: 'Mage',
 		sprite: sprite_03,
 		width: 105,
 		height: 130,
 		offsetX: 0,
-		offsetY: -95,
+		offsetY: -88,
 		frame: 0,
 		currentAnimation: 0,
 		currentAnimationFrames: 1,
+		currentAnimationHolds: 0,
+		holds: 0,
 		maxHp: 100,
 		hp: 100,
+		maxAp: 100,
+		ap: 100,
 		spd: 3,
 		ct: 0,
 		cct: 0,
@@ -147,7 +179,33 @@ window.onload = function() {
 		acted: 0
 	};
 
-	let characters = [char1, char2, char3];
+	let char4 = {
+		name: 'Slime',
+		sprite: sprite_04,
+		width: 102,
+		height: 120,
+		offsetX: 0,
+		offsetY: -88,
+		frame: 0,
+		currentAnimation: 0,
+		currentAnimationFrames: 19,
+		currentAnimationHolds: 1,
+		holds: 0,
+		maxHp: 100,
+		hp: 100,
+		maxAp: 100,
+		ap: 100,
+		spd: 4,
+		ct: 0,
+		cct: 0,
+		charPos: [4, 6],
+		movementRange: 2,
+		attackRange: 1,
+		moved: 0,
+		acted: 0
+	}
+
+	let characters = [char1, char2, char3, char4];
 
 	let currentChar = '';
 
@@ -157,20 +215,62 @@ window.onload = function() {
 
 	let characterDrawOrder = [];
 
-	//console.log(currentChar.charPos);
+	let currentTile = [];
 
 
-	function loop() {
-		ctCharge();
-		//turn();
-		//setTimeout(loop, 1000/60);
-		//turn();
-		//loop();
+
+	function assetLoaded() {
+		assets++;
+		
+		if(assets == 8) {
+			tileWidth = greenTile.width;
+			tileHeight = greenTile.height;
+
+			debug();
+
+			window.addEventListener('keydown', function(e) {
+				keyDownHandler(e);
+			}, false);
+
+			drawGrid();
+			animate();
+
+			checkState();
+		}
+	}
+
+
+	function checkState() {
+		console.log('checking state');
+		switch(states.current) {
+			case states.idle:
+				ctCharge();
+				break;
+
+			case states.battleMenu:
+				centerCamera(currentTile[0], currentTile[1], 1);
+				showCard('current', turno[0]);
+				menuHandler(states.current);
+				console.log('battleMenu');
+				break;
+
+			case states.action:
+				currentTile = currentChar.charPos;
+				centerCamera(currentTile[0], currentTile[1], 1);
+
+			case states.explore:
+				exploreField();
+				break;
+
+			case states.move:
+				centerCamera(currentTile[0], currentTile[1], 0);
+				break;
+		}
 	}
 
 
 	function ctCharge() {
-		//console.log('cargando');
+		console.log('cargando');
 		for(let i = 0; i < characters.length; i++) {
 			characters[i].ct += characters[i].spd;
 
@@ -185,6 +285,7 @@ window.onload = function() {
 
 
 	function checkTurn() {
+		console.log('check turn');
 		if(turno.length > 0) {
 			//console.log('Longitud = '+ turno.length +', activar turno');
 			turn();
@@ -193,26 +294,138 @@ window.onload = function() {
 		else {
 			//console.log('Longitud = 0, no hay turno');
 			states.current = states.idle;
-			setTimeout(loop, 1000/60);
+			setTimeout(checkState, 1000/60);
 		}
 	}
 
 
 	function turn(){
-		//console.log('inicia el turno');
+		console.log('inicia el turno');
 		currentChar = characters[turno[0]];
+		currentTile = currentChar.charPos;
 		states.current = states.battleMenu;
-		drawGrid();
+		states.prev = states.explore;
+		//states.current = states.explore;
+		//drawGrid();
+
+		//if(states.current == states.explore) {
+		//	exploreField();
+		//}
+		checkState();
+	}
+
+
+	function centerCamera(x, y, animated) {
+		if(animated == 1) {
+			let xOffsetNew = (((x - y) * (tileWidth / 2)) * -1) + ((canvasIso.width / 2) - (tileWidth / 2) );
+			let yOffsetNew = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2);
+
+			let xDiff = xOffsetNew - xOffset;
+			let yDiff = yOffsetNew - yOffset;
+
+			let xSteps = xDiff / 64;
+			let ySteps = yDiff / 64;
+
+			let centerSteps = [1, 3, 4, 8, 16, 16, 8, 4, 3, 1];
+
+			let centerCounter = 0;
+
+			let centering = setInterval(function() {
+				let xIncrease = centerSteps[centerCounter] * xSteps;
+				let yIncrease = centerSteps[centerCounter] * ySteps;
+
+				xOffset += xIncrease;
+				yOffset += yIncrease;
+
+				centerCounter++;
+
+				drawGrid();
+
+				if(centerCounter == 10) {
+					clearInterval(centering);
+				}
+			},1000/ 60);
+		}
+		else {
+			xOffset = (((x - y) * (tileWidth / 2)) * -1) + ((canvasIso.width / 2) - (tileWidth / 2) );
+			yOffset = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2);
+			drawGrid();
+		}
+	}
+
+
+	function exploreField() {
+		if(currentTile.length == 0) {
+			currentTile = currentChar.charPos;
+			drawGrid();
+		}
+	}
+
+
+	function showCard(card, index) {
+		let which = card == 'current' ? 'Character' : 'Target';
+		let whichChar = characters[index];
+
+		whichChar = characters[index];
+
+		cardId = document.getElementById('card' + which);
+
+		portraitCont = document.getElementById('portrait' + which);
+		nameCont = document.getElementById('name' + which);
+		hpCont = document.getElementById('hp' + which + 'Num');
+		maxHpCont = document.getElementById('hp' + which + 'MaxNum');
+		hpBar = document.getElementById('hp' + which);
+		apCont = document.getElementById('ap' + which + 'Num');
+		maxApCont = document.getElementById('ap' + which + 'MaxNum');
+		apBar = document.getElementById('ap' + which);
+		ctCont = document.getElementById('ct' + which + 'Num');
+		ctBar = document.getElementById('ct' + which);
+
+		portrait = whichChar.sprite.src;
+		name = whichChar.name;
+		hp = whichChar.hp;
+		maxHp = whichChar.maxHp;
+		hpPercent = (hp / maxHp) * 100;
+		ap = whichChar.ap;
+		maxAp = whichChar.maxAp;
+		apPercent = (ap / maxAp) * 100;
+		ct = whichChar.ct;
+
+		portraitCont.style.backgroundImage = 'url(' + portrait + ')';
+		nameCont.innerHTML = name;
+		hpCont.innerHTML = hp;
+		maxHpCont.innerHTML = maxHp;
+		hpBar.style.width = hpPercent + '%';
+		apCont.innerHTML = ap;
+		maxApCont.innerHTML = maxAp;
+		apBar.style.width = apPercent + '%';
+		ctCont.innerHTML = ct;
+		ctBar.style.width = ct + '%';
+
+		cardId.classList.remove('hide');
+	}
+
+
+	function hideCards() {
+		let cards = document.getElementsByClassName('card');
+		for(let i = 0; i < cards.length; i++) {
+			cards[i].classList.add('hide');
+		}
 	}
 
 
 	function drawGrid() {
+		console.log('draw');
 		cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
 		cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
 
 		characterDrawOrder = [];
 
-		menuHandler(states.current);
+		//if(currentTile.length > 0) {
+		//	centerCamera(currentTile[0], currentTile[1]);
+		//}
+
+		//menuHandler(states.current);
 
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {
@@ -226,6 +439,11 @@ window.onload = function() {
 					if(characters[k].charPos[1] == i && characters[k].charPos[0] == j) {
 						characterDrawOrder.push(k);
 					}
+				}
+
+				if(currentTile.length > 0 && currentTile[0] == j && currentTile[1] == i) {
+					//Colocar baldosa activa
+					placeTile(3, j, i);
 				}
 			}
 		}
@@ -258,7 +476,7 @@ window.onload = function() {
 			cCart.fill();
 
 			//dibujar personajes en retícula isométrica
-			cChars.drawImage(sprite, currentFrame * width, column * height, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+			cChars.drawImage(sprite, currentFrame * width, (column * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
 		}
 	}
 
@@ -267,15 +485,25 @@ window.onload = function() {
 		drawCharacters();
 
 		for(let i = 0; i < characters.length; i++) {
-			characters[i].frame ++;
+			if(characters[i].currentAnimationHolds > 0) {
+				if(characters[i].holds < characters[i].currentAnimationHolds) {
+					characters[i].holds++;
+				}
+				else {
+					characters[i].holds = 0;
+					characters[i].frame ++;
+				}
+			}
+			else {
+				characters[i].frame ++;
+			}
+			
 			if(characters[i].frame >= characters[i].currentAnimationFrames) {
 				characters[i].frame = 0;
 			}
 		}
 
-		//console.log('dibujar frame');
-
-		setTimeout(animate, 1000/14);
+		setTimeout(animate, 1000/30);
 	}
 
 
@@ -446,12 +674,17 @@ window.onload = function() {
 
 	function move(direction){
 		switch(states.current) {
+			case states.explore:
+				moveTile(direction);
+				break;
+
 			case states.battleMenu:
 				moveMenu('battleMenu', direction);
 				break;
 
 			case states.move:
-				moveTargetTile(direction);
+				//moveTargetTile(direction);
+				moveTile(direction);
 				break;
 
 			case states.action:
@@ -459,7 +692,8 @@ window.onload = function() {
 				break;
 
 			case states.attack:
-				moveTargetTile(direction);
+				moveTile(direction);
+				//moveTargetTile(direction);
 				break;
 
 			case states.confirm:
@@ -508,9 +742,10 @@ window.onload = function() {
 	}
 
 
-	function moveTargetTile(direction) {
-		let x = selTilePos[0];
-		let y = selTilePos[1];
+	function moveTile(direction) {
+		hideCards();
+		let x = currentTile[0];
+		let y = currentTile[1];
 
 		switch(direction) {
 			case 'up':
@@ -538,12 +773,14 @@ window.onload = function() {
 				break;
 		}
 
-		if(movementTiles[x] != undefined && movementTiles[x][y] != undefined) {
-			movementTiles[selTilePos[0]][selTilePos[1]] = 2;
-			movementTiles[x][y] = 3;
-			selTilePos = [x, y];
-			drawGrid();
+		currentTile = [x, y];
+		
+		let target = checkTile(currentTile, 'target');
+		if(target[0] == true) {
+				showCard('current', target[1]);
 		}
+
+		centerCamera(x, y, 0);
 	}
 
 
@@ -554,9 +791,13 @@ window.onload = function() {
 				break;
 
 			case states.move:
-				states.prev = states.move;
-				confirmAction('Move');
-				//moveSelect();
+				let targetTile = checkTile(currentTile, 'move');
+
+				if(targetTile[0] == true) {
+					states.prev = states.move;
+					confirmAction('Move');
+				}
+
 				break;
 
 			case states.action:
@@ -564,8 +805,11 @@ window.onload = function() {
 				break;
 
 			case states.attack:
-				states.prev = states.attack;
-				confirmAction('Attack');
+				let targetAttack = checkTile(currentTile, 'move');
+				if(targetAttack[0] == true) {
+					states.prev = states.attack;
+					confirmAction('Attack');
+				}
 				break;
 
 			case states.confirm:
@@ -573,6 +817,24 @@ window.onload = function() {
 				//if(states.prev == states.move) {
 				//	moveSelect();
 				//}
+				break;
+
+			case states.explore:
+				let target = checkTile(currentTile, 'target');
+				
+				if(target[0] == true) {
+					if(characters[target[1]] == currentChar) {
+						//Estamos seleccionando al personaje en turno, activar el menú
+						states.current = states.battleMenu;
+						checkState();
+					}
+					else {
+						//Estamos seleccionando a otro personaje, mostrar su rango de movimiento
+						states.current = states.showOtherRange;
+						showRange('move', target[1]);
+					}
+				}
+
 				break;
 		}
 	}
@@ -595,7 +857,7 @@ window.onload = function() {
 				states.current = states.move;
 				states.prev = states.battleMenu;
 				hideMenus();
-				showRange('move');
+				showRange('move', 'current');
 				break;
 
 			case 'act':
@@ -607,7 +869,7 @@ window.onload = function() {
 				states.current = states.attack;
 				states.prev = states.action;
 				hideMenus();
-				showRange('attack');
+				showRange('attack', 'current');
 				break;
 
 			case 'special':
@@ -615,7 +877,6 @@ window.onload = function() {
 				break;
 
 			case 'wait':
-				console.log('Esperar');
 				currentChar.moved = 0;
 				currentChar.acted = 0;
 				currentChar.ct = 0;
@@ -632,12 +893,15 @@ window.onload = function() {
 					states.current = states.move;
 					states.prev = states.battleMenu;
 					hideMenus();
-					showRange('move');
+					showRange('move', 'current');
+					centerCamera(currentTile[0], currentTile[1], 0);
 				}
 				else if(states.prev == states.attack) {
 					states.current = states.action;
 					hideMenus();
 					movementTiles = [];
+					currentTile = currentChar.charPos;
+					centerCamera(currentTile[0], currentTile[1], 0);
 					showMenu('battleMenu');
 					showMenu('actionMenu');
 					drawGrid();
@@ -659,6 +923,20 @@ window.onload = function() {
 		let confirmText = "";
 		let textSpan = document.getElementById('confirmText');
 
+		if(action == 'Move') {
+			confirmText = 'Move here?';
+		}
+		else if(action == 'Attack') {
+			confirmText = "Perform this action?";
+			//Revisar si hay un blanco en la baldosa seleccionada
+			let target = checkTile(currentTile, 'target');
+
+			if(target[0] == true) {
+				console.log('Si hay un blanco');
+				showCard('target', target[1]);
+			}
+		}
+
 		confirmText = action == 'Move' ? "Move here?" : "Perform this action?";
 
 		textSpan.innerHTML = confirmText;
@@ -670,7 +948,7 @@ window.onload = function() {
 
 	function moveSelect() {
 		prevPos = currentChar.charPos;
-		currentChar.charPos = selTilePos;
+		currentChar.charPos = currentTile;
 		movementTiles = [];
 
 		states.current = states.battleMenu;
@@ -680,13 +958,13 @@ window.onload = function() {
 
 		hideMenus();
 
-		drawGrid();
+		checkState();
 	}
 
 
 	function attackSelect() {
-		console.log('Revisar si hay un blanco en ' + selTilePos);
-		let target = checkTile(selTilePos, 'target');
+		console.log('Revisar si hay un blanco en ' + currentTile);
+		let target = checkTile(currentTile, 'target');
 		
 		if(target[0] == true) {
 			console.log('Hay un blanco, determinar si el golpe conecta (por ahora, siempre va a conectar)');
@@ -697,6 +975,8 @@ window.onload = function() {
 			console.log('No hay blanco');
 		}
 
+		currentTile = currentChar.charPos;
+		centerCamera(currentTile[0], currentTile[1], 0);
 		
 		console.log('De cualquier manera, mostrar la animación');
 
@@ -714,7 +994,6 @@ window.onload = function() {
 
 
 	function checkTile(tilePos, type) {
-		console.log('revisando baldosa ' + tilePos);
 		let result = [false];
 		switch(type) {
 			case 'target':
@@ -728,34 +1007,61 @@ window.onload = function() {
 				}
 				return result;
 				break;
+
+			case 'move':
+				let validTile = false;
+				let x = tilePos[0];
+				let y = tilePos[1];
+
+				if(movementTiles[x] != undefined && movementTiles[x][y] != undefined) {
+					validTile = true;
+				}
+
+				if(validTile) {
+					result = [true, tilePos];
+				}
+
+				return result;
+
+				break;
 		}
 	}
 
 
-	function showRange(kind) {
-		movementTiles = [];
-		selTilePos = currentChar.charPos;
+	function showRange(kind, char) {
 		let i = 0;
 		let targetTiles = [];
 		let range;
 		let tile;
+		let thisChar;
+
+		movementTiles = [];
+
+		if(char == 'current') {
+			thisChar = currentChar;
+		}
+		else {
+			thisChar = characters[char];
+		}
+
+		currentTile = thisChar.charPos;
 
 		switch(kind) {
 			case 'move':
-				range = movementRange;
+				range = thisChar.movementRange;
 				tile = 2;
 				break;
 
 			case 'attack':
-				range = attackRange;
+				range = thisChar.attackRange;
 				tile = 2;
 				break;
 		}
 
-		let nPoint = currentChar.charPos[1] - range;
-		let sPoint = currentChar.charPos[1] + range;
-		let wPoint = currentChar.charPos[0] - range;
-		let ePoint = currentChar.charPos[0] + range;
+		let nPoint = thisChar.charPos[1] - range;
+		let sPoint = thisChar.charPos[1] + range;
+		let wPoint = thisChar.charPos[0] - range;
+		let ePoint = thisChar.charPos[0] + range;
 
 		for(let j = wPoint; j <= ePoint; j++) {
 			targetTiles[j] = [];
@@ -763,13 +1069,13 @@ window.onload = function() {
 
 		for(let j = 0; j <= sPoint - nPoint; j++) {
 			let north = nPoint + j;
-			let west = selTilePos[0] - i;
-			let east = selTilePos[0] + i;
+			let west = currentTile[0] - i;
+			let east = currentTile[0] + i;
 
 			if(west != east) {
 				for(let k = west; k <= east; k++) {
-					if(k == selTilePos[0] && north == selTilePos[1]) {
-						targetTiles[k][north] = 3;
+					if(k == currentTile[0] && north == currentTile[1]) {
+						//targetTiles[k][north] = 3;
 					}
 					else {
 						targetTiles[k][north] = tile;
@@ -780,7 +1086,7 @@ window.onload = function() {
 				targetTiles[west][north] = tile;
 			}
 
-			if(north >= selTilePos[1]) {
+			if(north >= currentTile[1]) {
 				i--;
 			}
 			else {
@@ -789,6 +1095,8 @@ window.onload = function() {
 		}
 
 		movementTiles = targetTiles;
+
+		console.log(movementTiles);
 
 		drawGrid();
 	}
@@ -800,13 +1108,14 @@ window.onload = function() {
 				states.current = states.move;
 				states.prev = states.battleMenu;
 				hideMenus();
-				showRange('move');
+				showRange('move', 'current');
 				break;
 
 			case states.battleMenu:
 				movementTiles = [];
+				currentTile = currentChar.charPos;
 				states.current = states.battleMenu;
-				states.prev = states.battleMenu;
+				states.prev = states.explore;
 				hideMenus();
 				break;
 
@@ -819,22 +1128,26 @@ window.onload = function() {
 				showMenu('battleMenu');
 				showMenu('actionMenu');
 				break;
+
+			case states.explore:
+				movementTiles = [];
+				drawGrid();
+				states.current = states.explore;
+				hideMenus();
+				checkState();
+				break;
 		}
 
-		drawGrid();
+		checkState();
+
+		//drawGrid();
 	}
 
-	window.addEventListener('keydown', function(e) {
-		keyDownHandler(e);
-	}, false);
 
-	battleOrder();
+	function randomNumber(min, max) {
+		return Math.floor(Math.random() * (max - min + 1) ) + min;
+	}
 
-	loop();
-
-	debug();
-
-	animate();
 
 	function debug() {
 		document.getElementById('currentState').innerHTML = states.current;

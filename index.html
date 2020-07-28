@@ -14,40 +14,42 @@
 	</div>
 
 	<div id="debug">
-		<div style="border:1px solid red; width:100px; float:left;">
+		<div style="border:1px solid red; width:250px; float:left;">
 			States:<br>
-			0: Idle<br>
+			0: Idle
 			1: Battle Menu<br>
-			2: Move<br>
+			2: Move
 			3: Action<br>
-			4: Confirm<br>
+			4: Confirm
 			5: Attack<br>
-			Current:<br>
+			6: Explore
+			7: Show Other's Range
+			Current:
 			<span id="currentState"></span><br>
-			Previous:<br>
+			Previous:
 			<span id="previousState"></span>
 		</div>
 
 		<div class="debug" id="Character_1" style="border:1px solid red; width:100px; float:left;">
 			<div id="char1Name"></div>
-			<p>HP: <span id="char1Hp"></span></p>
-			<p>CT: <span id="char1Ct"></span></p>
-			<p>Acted: <span id="char1Acted"></span></p>
-			<p>Moved: <span id="char1Moved"></span></p>
+			HP: <span id="char1Hp"></span><br>
+			CT: <span id="char1Ct"></span><br>
+			Acted: <span id="char1Acted"></span><br>
+			Moved: <span id="char1Moved"></span><br>
 		</div>
 		<div class="debug" id="Character_2" style="border:1px solid red; width:100px; float:left;">
 			<div id="char2Name"></div>
-			<p>HP: <span id="char2Hp"></span></p>
-			<p>CT: <span id="char2Ct"></span></p>
-			<p>Acted: <span id="char2Acted"></span></p>
-			<p>Moved: <span id="char2Moved"></span></p>
+			HP: <span id="char2Hp"></span><br>
+			CT: <span id="char2Ct"></span><br>
+			Acted: <span id="char2Acted"></span><br>
+			Moved: <span id="char2Moved"></span><br>
 		</div>
 		<div class="debug" id="Character_3" style="border:1px solid red; width:100px; float:left;">
 			<div id="char3Name"></div>
-			<p>HP: <span id="char3Hp"></span></p>
-			<p>CT: <span id="char3Ct"></span></p>
-			<p>Acted: <span id="char3Acted"></span></p>
-			<p>Moved: <span id="char3Moved"></span></p>
+			HP: <span id="char3Hp"></span><br>
+			CT: <span id="char3Ct"></span><br>
+			Acted: <span id="char3Acted"></span><br>
+			Moved: <span id="char3Moved"></span><br>
 		</div>
 
 		<div style="border:1px solid red; width:100px; float:left;">
@@ -57,6 +59,58 @@
 
 	<div id="ui">
 		<div id="turnList"></div>
+
+		<div id="cards">
+			<div class="card hide" id="cardCharacter">
+				<div class="cardInfo" id="infoCharacter">
+					<span class="barName">HP</span>
+					<div class="barCont">
+						<div class="bar hp" id="hpCharacter"></div>
+					</div>
+					<span class="number numberHp" id="hpCharacterNum">100</span><span> / </span><span id="hpCharacterMaxNum">100</span>
+
+					<span class="barName">AP</span>
+					<div class="barCont">
+						<div class="bar ap" id="apCharacter"></div>
+					</div>
+					<span class="number numberAp" id="apCharacterNum">100</span><span> / </span><span id="apCharacterMaxNum">100</span>
+
+					<span class="barName">CT</span>
+					<div class="barCont">
+						<div class="bar ct" id="ctCharacter"></div>
+					</div>
+					<span class="number numberCt" id="ctCharacterNum">100</span><span> / </span><span>100</span>
+				</div>
+
+				<div class="portrait" id="portraitCharacter"></div>
+				<span class="cardName" id="nameCharacter">Monk</span>
+			</div>
+
+			<div class="card hide" id="cardTarget">
+				<div class="cardInfo" id="infoTarget">
+					<span class="barName">HP</span>
+					<div class="barCont">
+						<div class="bar hp" id="hpTarget"></div>
+					</div>
+					<span class="number numberHp" id="hpTargetNum">100</span><span> / </span><span id="hpTargetMaxNum">100</span>
+
+					<span class="barName">AP</span>
+					<div class="barCont">
+						<div class="bar ap" id="apTarget"></div>
+					</div>
+					<span class="number numberAp" id="apTargetNum">100</span><span> / </span><span id="apTargetMaxNum">100</span>
+
+					<span class="barName">CT</span>
+					<div class="barCont">
+						<div class="bar ct" id="ctTarget"></div>
+					</div>
+					<span class="number numberCt" id="ctTargetNum">100</span><span> / </span><span>100</span>
+				</div>
+
+				<div class="portrait" id="portraitTarget"></div>
+				<span class="cardName" id="nameTarget">Monk</span>
+			</div>			
+		</div>
 
 		<div class="menu hidden" id="battleMenu">
 			<ul id="battleMenu_options">
@@ -80,12 +134,14 @@
 		</div>
 	</div>
 
-	<img src="img/greenTile.png" />
-	<img src="img/redTile.png" />
-	<img src="img/walkableTile.png" />
-	<img src="img/activeTile.png" />
-	<img src="img/sprite_01.png" />
-	<img src="img/sprite_02.png" />
-	<img src="img/sprite_03.png" />
+	<div style="display:none;">
+		<!--<img src="img/greenTile.png" />
+		<img src="img/redTile.png" />
+		<img src="img/walkableTile.png" />
+		<img src="img/activeTile.png" />-->
+		<!--<img src="img/sprite_01.png" />
+		<img src="img/sprite_02.png" />
+		<img src="img/sprite_03.png" />-->
+	</div>
 </body>
 </html>
