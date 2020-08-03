@@ -14,16 +14,19 @@
 	</div>
 
 	<div id="debug">
-		<div style="border:1px solid red; width:250px; float:left;">
+		<div style="border:1px solid red; width:330px; float:left;">
 			States:<br>
 			0: Idle
-			1: Battle Menu<br>
+			1: Battle Menu
 			2: Move
-			3: Action<br>
+			3: Action
 			4: Confirm
-			5: Attack<br>
+			5: Attack
 			6: Explore
 			7: Show Other's Range
+			8: Enemy Turn
+			9: Facing Selection
+			10: Battle Over<br>
 			Current:
 			<span id="currentState"></span><br>
 			Previous:
@@ -36,6 +39,7 @@
 			CT: <span id="char1Ct"></span><br>
 			Acted: <span id="char1Acted"></span><br>
 			Moved: <span id="char1Moved"></span><br>
+			Current Animation: <span id="char1Animation"></span>
 		</div>
 		<div class="debug" id="Character_2" style="border:1px solid red; width:100px; float:left;">
 			<div id="char2Name"></div>

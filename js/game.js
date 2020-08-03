@@ -1,3 +1,123 @@
+function Character(args) {
+	this.name = args[0];
+	
+	this.sprite = args[1];
+	this.width = args[2];
+	this.height = args[3];
+	this.offsetX = args[4];
+	this.offsetY = args[5];
+
+	this.lvl = args[6];
+	this.xp = args[7];
+
+	this.maxHp = args[8];
+	this.hp = args[8];
+	this.maxAp = args[9];
+	this.ap = args[9];
+
+	this.spd = args[10];
+	this.str = args[11];
+	this.def = args[12];
+	this.mAtk = args[13];
+	this.mDef = args[14];
+
+	this.movementRange = args[15];
+	this.attackRange = args[16];
+	this.minRange = args[17];
+	this.jump = args[18];
+
+	this.command = args[19];
+
+	this.currentAnimation = 0;
+	this.frame = 0;
+	this.animationFrames = args[20];
+
+	this.ct = 0;
+	this.cct = 0;
+
+	this.facing = 0;
+	this.charPos = [];
+	this.moved = 0;
+	this.acted = 0;
+	this.selectFacing = 0;
+}
+
+Character.prototype.animate = function() {
+	this.frame ++ ;
+
+	if(this.frame == this.animationFrames[this.currentAnimation].length) {
+		this.frame = 0;
+	}
+}
+
+function Sprite(animationFrames) {
+	this.frame = 0;
+	this.animationFrames;
+}
+
+let sprite_01 = new Image();
+let sprite_02 = new Image();
+let sprite_03 = new Image();
+let sprite_04 = new Image();
+let shadow = new Image();
+let arrowSprite = new Image();
+
+
+let charList = [
+	[
+		'Monk', sprite_01, 204, 138, -45, -85, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Zen', 'Zen Punch'],
+		[
+			[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+			[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+			[0],
+			[0]
+		]
+	],
+	[
+		'Fighter', sprite_02, 108, 150, 4, -105, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
+		[
+			[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+			[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+			[0],
+			[0]
+		]
+	],
+	[
+		'Mage', sprite_03, 105, 130, 4, -80, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
+		[
+			[0],
+			[0],
+			[0],
+			[0]
+		]
+	],
+	[
+		'Slime', sprite_04, 102, 120, 6, -84, 1, 0, 100, 50, 3, 5, 5, 5, 5, 2, 1, 0, 0, [],
+		[
+			[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+			[0],
+			[0],
+			[0]
+		]
+	]
+];
+
+
+let gridList = [
+	[
+		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
+	]
+];
+
 window.onload = function() {
 	let canvasCart = document.getElementById('gameCanvasCart');
 	let cCart = canvasCart.getContext('2d');
@@ -8,60 +128,39 @@ window.onload = function() {
 	let canvasChars = document.getElementById('gameCanvasIsoChars');
 	let cChars = canvasChars.getContext('2d');
 
-	let greenTile = new Image();
-	greenTile.src = 'img/greenTile.png';
-	greenTile.addEventListener('load', assetLoaded);
+	let tileSprite = new Image();
+	tileSprite.src = 'img/tiles.png';
+	tileSprite.addEventListener('load', assetLoaded);
 
-	let redTile = new Image();
-	redTile.src = 'img/redTile.png';
-	redTile.addEventListener('load', assetLoaded);
-
-	let walkableTile = new Image();
-	walkableTile.src = 'img/walkableTile.png';
-	walkableTile.addEventListener('load', assetLoaded);
-
-	let activeTile = new Image();
-	activeTile.src = 'img/activeTile.png';
-	activeTile.addEventListener('load', assetLoaded);
-
-	let sprite_01 = new Image();
 	sprite_01.src = 'img/sprite_01.png';
 	sprite_01.addEventListener('load', assetLoaded);
 
-	let sprite_02 = new Image();
 	sprite_02.src = 'img/sprite_02.png';
 	sprite_02.addEventListener('load', assetLoaded);
 
-	let sprite_03 = new Image();
 	sprite_03.src = 'img/sprite_03.png';
 	sprite_03.addEventListener('load', assetLoaded);
 
-	let sprite_04 = new Image();
 	sprite_04.src = 'img/sprite_04.png';
 	sprite_04.addEventListener('load', assetLoaded);
 
+	shadow.src = 'img/shadow.png';
+	shadow.addEventListener('load', assetLoaded);
+
+	arrowSprite.src = 'img/arrow.png';
+	arrowSprite.addEventListener('load', assetLoaded);
+
 	let assets = 0;
 
-	let tileWidth = greenTile.width;
-	let tileHeight = greenTile.height;
+	let tileWidth = 112;
+	let tileHeight = 60;
 
 	let portraitSize = 120;
 
 	let gridWidth = 10;
 	let gridHeight = 10;
 
-	let grid = [
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-	];
+	let grid = gridList[0];
 
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
@@ -92,7 +191,10 @@ window.onload = function() {
 		confirm: 4,
 		attack: 5,
 		explore: 6,
-		showOtherRange: 7
+		showOtherRange: 7,
+		enemyTurn: 8,
+		faceSelection : 9,
+		battleOver: 10
 	}
 
 	let movementTiles = [];
@@ -101,111 +203,31 @@ window.onload = function() {
 	let moved = 0;
 	let acted = 0;
 
-	let char1 = {
-		name: 'Monk',
-		sprite: sprite_01,
-		width: 108,
-		height: 130,
-		offsetX: 0,
-		offsetY: -95,
-		frame: 0,
-		currentAnimation: 0,
-		currentAnimationFrames: 8,
-		currentAnimationHolds: 1,
-		holds: 0,
-		maxHp: 100,
-		hp: 100,
-		maxAp: 50,
-		ap: 50,
-		spd: 5,
-		ct: 0,
-		cct: 0,
-		charPos: [3, 3],
-		movementRange: 2,
-		attackRange: 1,
-		moved: 0,
-		acted: 0
-	};
-
-	let char2 = {
-		name: 'Fighter',
-		sprite: sprite_02,
-		width: 108,
-		height: 150,
-		offsetX: 0,
-		offsetY: -115,
-		frame: 0,
-		currentAnimation: 0,
-		currentAnimationFrames: 9,
-		currentAnimationHolds: 4,
-		holds: 0,
-		maxHp: 150,
-		hp: 45,
-		maxAp: 35,
-		ap: 30,
-		spd: 8,
-		ct: 0,
-		cct: 0,
-		charPos: [4, 5],
-		movementRange: 2,
-		attackRange: 1,
-		moved: 0,
-		acted: 0
-	};
-
-	let char3 = {
-		name: 'Mage',
-		sprite: sprite_03,
-		width: 105,
-		height: 130,
-		offsetX: 0,
-		offsetY: -88,
-		frame: 0,
-		currentAnimation: 0,
-		currentAnimationFrames: 1,
-		currentAnimationHolds: 0,
-		holds: 0,
-		maxHp: 100,
-		hp: 100,
-		maxAp: 100,
-		ap: 100,
-		spd: 3,
-		ct: 0,
-		cct: 0,
-		charPos: [2, 3],
-		movementRange: 2,
-		attackRange: 1,
-		moved: 0,
-		acted: 0
-	};
-
-	let char4 = {
-		name: 'Slime',
-		sprite: sprite_04,
-		width: 102,
-		height: 120,
-		offsetX: 0,
-		offsetY: -88,
-		frame: 0,
-		currentAnimation: 0,
-		currentAnimationFrames: 19,
-		currentAnimationHolds: 1,
-		holds: 0,
-		maxHp: 100,
-		hp: 100,
-		maxAp: 100,
-		ap: 100,
-		spd: 4,
-		ct: 0,
-		cct: 0,
-		charPos: [4, 6],
-		movementRange: 2,
-		attackRange: 1,
-		moved: 0,
-		acted: 0
+	let arrow = {
+		sprite: arrowSprite,
+		currentFrame: 0,
+		currentAnimationFrames: 4,
+		currentAnimationHolds: 3,
+		holds: 0
 	}
 
+	let char1 = new Character(charList[0]);
+	char1.charPos = [1,4];
+
+	let char2 = new Character(charList[1]);
+	char2.charPos = [4,4];
+
+	let char3 = new Character(charList[2]);
+	char3.charPos = [5,1];
+
+	let char4 = new Character(charList[3]);
+	char4.charPos = [4, 6];
+
 	let characters = [char1, char2, char3, char4];
+
+	let playerParty = [0, 1, 2];
+
+	let enemyParty = [3];
 
 	let currentChar = '';
 
@@ -222,9 +244,7 @@ window.onload = function() {
 	function assetLoaded() {
 		assets++;
 		
-		if(assets == 8) {
-			tileWidth = greenTile.width;
-			tileHeight = greenTile.height;
+		if(assets == 7) {
 
 			debug();
 
@@ -241,36 +261,124 @@ window.onload = function() {
 
 
 	function checkState() {
-		console.log('checking state');
-		switch(states.current) {
-			case states.idle:
-				ctCharge();
-				break;
+		console.log('checking state: ' + states.current);
+		if(checkParties()) {
+			switch(states.current) {
+				case states.idle:
+					ctCharge();
+					break;
 
-			case states.battleMenu:
-				centerCamera(currentTile[0], currentTile[1], 1);
-				showCard('current', turno[0]);
-				menuHandler(states.current);
-				console.log('battleMenu');
-				break;
+				case states.battleMenu:
+					currentChar.selectFacing = 0;
+					centerCamera(currentTile[0], currentTile[1], 1);
+					showCard('current', turno[0]);
+					menuHandler(states.current);
+					//console.log('battleMenu');
+					break;
 
-			case states.action:
-				currentTile = currentChar.charPos;
-				centerCamera(currentTile[0], currentTile[1], 1);
+				case states.action:
+					currentTile = currentChar.charPos;
+					centerCamera(currentTile[0], currentTile[1], 1);
 
-			case states.explore:
-				exploreField();
-				break;
+				case states.explore:
+					exploreField();
+					break;
 
-			case states.move:
-				centerCamera(currentTile[0], currentTile[1], 0);
-				break;
+				case states.move:
+					centerCamera(currentTile[0], currentTile[1], 0);
+					break;
+
+				case states.faceSelection:
+					hideMenus();
+					currentChar.selectFacing = 1;
+					break;
+
+				case states.enemyTurn:
+					enemyTurn(turno[0]);
+					break;
+			}
+		}
+		else {
+			console.log('Game Over');
+			hideMenus();
+			states.current = states.battleOver;
+		}
+	}
+
+
+	function enemyTurn(enemy) {
+		//console.log('centrar camara en enemigo');
+		centerCamera(currentTile[0], currentTile[1], 1);
+		console.log('inicia Turno Enemigo');
+		console.log('Evaluar Situacion');
+		console.log('Buscar blanco más cercano');
+
+		let distances = [];
+		//Calcular la distancia a cada uno de los miembros del grupo
+		for(let i = 0; i < playerParty.length; i++) {
+			let distance = calculateDistance(characters[enemy].charPos, characters[playerParty[i]].charPos);
+			distances.push(distance);
+		}
+
+		//Determinar cuál es el más cercano
+		let closest = distances.indexOf(Math.min(...distances));
+
+		showRange('move', 'current');
+
+		let rangeDistances = [];
+		let rangeDistancesIndexes = [];
+
+		let moveKeysX = Object.keys(movementTiles);
+
+		//Calcular la distancia entre el blanco y las baldosas dentro del rango de movimiento
+		for(let i = 0; i < moveKeysX.length; i++) {
+			//rangeDistances[moveKeysX[i]] = [];
+			let moveKeysY = Object.keys(movementTiles[moveKeysX[i]]);
+
+			for(let j = 0; j < moveKeysY.length; j++) {
+				let coords = [moveKeysX[i], moveKeysY[j]];
+				let rangeDistance = calculateDistance(coords, characters[playerParty[closest]].charPos);
+				console.log('distancia' + rangeDistance);
+				//rangeDistances[moveKeysX[i]][moveKeysY[j]] = rangeDistance;
+				rangeDistances.push(rangeDistance);
+				rangeDistancesIndexes.push(coords);
+			}
+		}
+
+		let closestDistance = rangeDistances.indexOf(Math.min(...rangeDistances));
+
+		setTimeout(function(){
+			let x = parseInt(rangeDistancesIndexes[closestDistance][0]);
+			let y = parseInt(rangeDistancesIndexes[closestDistance][1]);
+			currentTile = [x, y];
+			//drawGrid();
+			centerCamera(x, y, 1);
+			moveSelect();
+		}, 1000);
+	}
+
+
+	function calculateDistance(p1, p2) {
+		let d = Math.sqrt( Math.pow((p2[0] - p1[0]), 2) + Math.pow((p2[1] - p1[1]), 2) );
+
+		return d;
+	}
+
+
+	function checkParties() {
+		if(playerParty.length > 0 && enemyParty.length > 0){
+			//console.log('Aún hay personajes');
+			return true;
+		}
+		else {
+			//console.log('Se murio un grupo');
+			return false;
 		}
 	}
 
 
 	function ctCharge() {
-		console.log('cargando');
+		//console.log('cargando');
 		for(let i = 0; i < characters.length; i++) {
 			characters[i].ct += characters[i].spd;
 
@@ -284,8 +392,9 @@ window.onload = function() {
 	}
 
 
+	//Revisa si es turno de algun personaje o si sigue corriendo el tiempo
 	function checkTurn() {
-		console.log('check turn');
+		//console.log('check turn');
 		if(turno.length > 0) {
 			//console.log('Longitud = '+ turno.length +', activar turno');
 			turn();
@@ -301,16 +410,20 @@ window.onload = function() {
 
 	function turn(){
 		console.log('inicia el turno');
+
 		currentChar = characters[turno[0]];
 		currentTile = currentChar.charPos;
-		states.current = states.battleMenu;
-		states.prev = states.explore;
-		//states.current = states.explore;
-		//drawGrid();
 
-		//if(states.current == states.explore) {
-		//	exploreField();
-		//}
+		if(playerParty.includes(turno[0])) {	
+			states.current = states.battleMenu;
+			states.prev = states.explore;
+		}
+
+		else {
+			states.current = states.enemyTurn;
+			states.prev = states.enemyTurn;
+		}
+
 		checkState();
 	}
 
@@ -318,7 +431,7 @@ window.onload = function() {
 	function centerCamera(x, y, animated) {
 		if(animated == 1) {
 			let xOffsetNew = (((x - y) * (tileWidth / 2)) * -1) + ((canvasIso.width / 2) - (tileWidth / 2) );
-			let yOffsetNew = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2);
+			let yOffsetNew = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2) + (x * 2) + (y * 2);
 
 			let xDiff = xOffsetNew - xOffset;
 			let yDiff = yOffsetNew - yOffset;
@@ -348,7 +461,8 @@ window.onload = function() {
 		}
 		else {
 			xOffset = (((x - y) * (tileWidth / 2)) * -1) + ((canvasIso.width / 2) - (tileWidth / 2) );
-			yOffset = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2);
+			yOffset = (((x + y) * (tileHeight / 2)) * -1) + (canvasIso.height / 2) - (tileHeight / 2) + (x * 2) + (y * 2);
+
 			drawGrid();
 		}
 	}
@@ -357,8 +471,8 @@ window.onload = function() {
 	function exploreField() {
 		if(currentTile.length == 0) {
 			currentTile = currentChar.charPos;
-			drawGrid();
 		}
+		drawGrid();
 	}
 
 
@@ -421,12 +535,6 @@ window.onload = function() {
 
 		characterDrawOrder = [];
 
-		//if(currentTile.length > 0) {
-		//	centerCamera(currentTile[0], currentTile[1]);
-		//}
-
-		//menuHandler(states.current);
-
 		for(let i = 0; i < gridHeight; i++) {
 			for(let j = 0; j < gridWidth; j++) {
 				placeTile(grid[i][j], j, i);
@@ -463,8 +571,12 @@ window.onload = function() {
 			let height = characters[char].height;
 			let offsetX = characters[char].offsetX;
 			let offsetY = characters[char].offsetY;
-			let currentFrame = characters[char].frame;
-			let column = characters[char].currentAnimation;
+			
+			let frame = characters[char].frame;
+			let currentAnimation = characters[char].currentAnimation;
+			let animationFrames = characters[char].animationFrames;
+
+			let currentFrame = animationFrames[currentAnimation][frame];
 
 			let cordsIso = cartToIso(x, y);
 			let sprite = characters[char].sprite;
@@ -476,7 +588,17 @@ window.onload = function() {
 			cCart.fill();
 
 			//dibujar personajes en retícula isométrica
-			cChars.drawImage(sprite, currentFrame * width, (column * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+			cChars.drawImage(shadow, 0, 0, 56, 22, cordsIso[0] + 28, cordsIso[1] + 25, 56, 20);
+			cChars.drawImage(sprite, currentFrame * width, (currentAnimation * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+
+			if(characters[char] == currentChar) {
+				if(characters[char].selectFacing == 1) {
+					cChars.drawImage(tileSprite, characters[char].facing * tileWidth, tileHeight * 2, tileWidth, tileHeight, cordsIso[0] + 0, cordsIso[1] - 100, tileWidth, tileHeight);
+				}
+				else {
+					cChars.drawImage(arrowSprite, arrow.currentFrame * 32, 0, 32, 16, cordsIso[0] + 40, cordsIso[1] - 110, 32, 16);
+				}
+			}
 		}
 	}
 
@@ -485,28 +607,27 @@ window.onload = function() {
 		drawCharacters();
 
 		for(let i = 0; i < characters.length; i++) {
-			if(characters[i].currentAnimationHolds > 0) {
-				if(characters[i].holds < characters[i].currentAnimationHolds) {
-					characters[i].holds++;
-				}
-				else {
-					characters[i].holds = 0;
-					characters[i].frame ++;
-				}
-			}
-			else {
-				characters[i].frame ++;
-			}
-			
-			if(characters[i].frame >= characters[i].currentAnimationFrames) {
-				characters[i].frame = 0;
-			}
+			characters[i].animate();
 		}
+
+		if(arrow.holds < arrow.currentAnimationHolds) {
+			arrow.holds++;
+		}
+		else {
+			arrow.holds = 0;
+			arrow.currentFrame++;
+		}
+
+		if(arrow.currentFrame >= arrow.currentAnimationFrames) {
+			arrow.currentFrame = 0;
+		}
+
 
 		setTimeout(animate, 1000/30);
 	}
 
 
+	//Calcula el orden de los siguientes turnos
 	function battleOrder() {
 		turnList = [];
 		let list = '';
@@ -539,6 +660,7 @@ window.onload = function() {
 		//hideMenus();
 		switch(state) {
 			case states.battleMenu:
+				hideMenus();
 				showMenu('battleMenu');
 				break;
 
@@ -552,6 +674,7 @@ window.onload = function() {
 	}
 
 
+	//Esconde los menús
 	function hideMenus() {
 		var menus = document.getElementsByClassName('menu');
 		for(let i = 0; i < menus.length; i++) {
@@ -561,6 +684,7 @@ window.onload = function() {
 	}
 
 
+	//Muestra un menú en específico
 	function showMenu(id) {
 		switch(id) {
 			case 'battleMenu':
@@ -590,31 +714,60 @@ window.onload = function() {
 
 
 	function placeTile(tileKind, x, y) {
-		let tile;
 		let posYCart = y * tileHeight;
 		let posXCart = x * tileHeight;
+		let sx;
+		let sy;
 
 		let cordsIso = cartToIso(x, y);
 
 		switch(tileKind) {
 			case 0:
 				cCart.fillStyle = '#00FF00';
-				tile = greenTile;
+				sx = 0;
+				sy = 0;
 				break;
 
 			case 1:
 				cCart.fillStyle = '#FF0000';
-				tile = redTile;
+				sx = 2;
+				sy = 0;
 				break;
 
 			case 2:
 				cCart.fillStyle = '#0000FF';
-				tile = walkableTile;
+				sx = 1;
+				sy = 0;
 				break;
 
 			case 3:
 				cCart.fillStyle = '#AAAAAA';
-				tile = activeTile;
+				sx = 3;
+				sy = 0;
+				break;
+
+			case 4:
+				cCart.fillStyle = '#00FF00';
+				sx = 0;
+				sy = 1;
+				break;
+
+			case 5:
+				cCart.fillStyle = '#00FF00';
+				sx = 1;
+				sy = 1;
+				break;
+
+			case 6:
+				cCart.fillStyle = '#00FF00';
+				sx = 2;
+				sy = 1;
+				break;
+
+			case 7:
+				cCart.fillStyle = '#00FF00';
+				sx = 3;
+				sy = 1;
 				break;
 		}
 
@@ -622,16 +775,16 @@ window.onload = function() {
 		cCart.fillRect(posXCart, posYCart, tileHeight, tileHeight);
 
 		//Place Iso tile
-		cIso.drawImage(tile, cordsIso[0], cordsIso[1], tileWidth, tileHeight);
-		
+		cIso.drawImage(tileSprite, (sx * tileWidth), (sy * tileHeight), tileWidth, tileHeight, cordsIso[0], cordsIso[1], tileWidth, tileHeight);
 	}
 
 
+	//Convierte las coordenadas cartesianas de un punto a isométrico
 	function cartToIso(x, y) {
 		let cordsIso = [];
 
 		let posX = ((x - y) * (tileWidth / 2)) + xOffset;
-		let posY = ((x + y) * (tileHeight / 2)) + yOffset;
+		let posY = ((x + y) * (tileHeight / 2)) + yOffset - (x * 2) - (y * 2);
 
 		cordsIso.push(posX, posY);
 
@@ -672,6 +825,7 @@ window.onload = function() {
 	}
 
 
+	//Acciones que ocurren al presionar una de las teclas de movimiento
 	function move(direction){
 		switch(states.current) {
 			case states.explore:
@@ -698,10 +852,50 @@ window.onload = function() {
 
 			case states.confirm:
 				moveMenu('confirmMenu', direction);
+				break;
+
+			case states.faceSelection:
+				selectDirection(direction);
+				break;
 		}
 	}
 
 
+	//Cambia la dirección hacia donde está viendo un personaje
+	function selectDirection(direction) {
+		switch(direction) {
+			case 'down':
+				//Sur
+				currentChar.facing = 0;
+				currentChar.currentAnimation = 0;
+				currentChar.frame = 0;
+				break;
+
+			case 'right':
+				//Este
+				currentChar.facing = 1;
+				currentChar.currentAnimation = 1;
+				currentChar.frame = 0;
+				break;
+
+			case 'up':
+				//Norte
+				currentChar.facing = 2;
+				currentChar.currentAnimation = 2;
+				currentChar.frame = 0;
+				break;
+
+			case 'left':
+				//Oeste
+				currentChar.facing = 3;
+				currentChar.currentAnimation = 3;
+				currentChar.frame = 0;
+				break;
+		}
+	}
+
+
+	//Moverse dentro de los menús
 	function moveMenu(menuName, direction) {
 		let menuOptions = menuName + '_options';
 		let menu = document.getElementById(menuOptions);
@@ -784,6 +978,7 @@ window.onload = function() {
 	}
 
 
+	//Acciones que se realizan al presionar el botón de acción
 	function actionButton() {
 		switch(states.current) {
 			case states.battleMenu:
@@ -814,9 +1009,6 @@ window.onload = function() {
 
 			case states.confirm:
 				menuSelect('confirmMenu');
-				//if(states.prev == states.move) {
-				//	moveSelect();
-				//}
 				break;
 
 			case states.explore:
@@ -831,15 +1023,22 @@ window.onload = function() {
 					else {
 						//Estamos seleccionando a otro personaje, mostrar su rango de movimiento
 						states.current = states.showOtherRange;
+						states.prev = states.explore;
 						showRange('move', target[1]);
 					}
 				}
 
 				break;
+
+			case states.faceSelection:
+				states.prev = states.faceSelection;
+				confirmAction('Wait');
+				break;
 		}
 	}
 
 
+	//Las acciones que se realizan al haber seleccionado una opción en un menú
 	function menuSelect(menuName) {
 		let menuOptions = menuName + '_options';
 		let menu = document.getElementById(menuOptions);
@@ -877,15 +1076,9 @@ window.onload = function() {
 				break;
 
 			case 'wait':
-				currentChar.moved = 0;
-				currentChar.acted = 0;
-				currentChar.ct = 0;
-				currentChar = '';
-				document.getElementById('move').classList.remove('off');
-				document.getElementById('act').classList.remove('off');
-				hideMenus();
-				turno.shift();
-				checkTurn();
+				states.prev = states.battleMenu;
+				states.current = states.faceSelection;
+				checkState();
 				break;
 
 			case 'cancel':
@@ -899,12 +1092,19 @@ window.onload = function() {
 				else if(states.prev == states.attack) {
 					states.current = states.action;
 					hideMenus();
+					hideCards();
 					movementTiles = [];
 					currentTile = currentChar.charPos;
 					centerCamera(currentTile[0], currentTile[1], 0);
 					showMenu('battleMenu');
 					showMenu('actionMenu');
 					drawGrid();
+				}
+				else if(states.prev == states.faceSelection) {
+					states.current = states.battleMenu;
+					states.prev = states.battleMenu;
+					hideMenus();
+					checkState();
 				}
 				break;
 
@@ -915,29 +1115,51 @@ window.onload = function() {
 				else if(states.prev == states.attack) {
 					attackSelect();
 				}
+				else if(states.prev == states.faceSelection) {
+					//Fin del turno
+					currentChar.moved = 0;
+					currentChar.acted = 0;
+					currentChar.ct = 0;
+					currentChar = '';
+					document.getElementById('move').classList.remove('off');
+					document.getElementById('act').classList.remove('off');
+					hideMenus();
+					turno.shift();
+					checkTurn();
+				}
+				break;
 		}
 	}
 
 
+	//Muestra mensaje de confirmación para realizar una acción.
 	function confirmAction(action) {
 		let confirmText = "";
 		let textSpan = document.getElementById('confirmText');
 
-		if(action == 'Move') {
-			confirmText = 'Move here?';
-		}
-		else if(action == 'Attack') {
-			confirmText = "Perform this action?";
-			//Revisar si hay un blanco en la baldosa seleccionada
-			let target = checkTile(currentTile, 'target');
+		switch(action) {
+			case 'Move':
+				confirmText = 'Move here?';
+				break;
 
-			if(target[0] == true) {
-				console.log('Si hay un blanco');
-				showCard('target', target[1]);
-			}
-		}
+			case 'Attack':
+				confirmText = 'Perform this action';
 
-		confirmText = action == 'Move' ? "Move here?" : "Perform this action?";
+				//Revisar si hay un blanco en la baldosa seleccionada
+				let target = checkTile(currentTile, 'target');
+
+				if(target[0] == true) {
+					//Si se encontró un blanco
+					showCard('current', turno[0]);
+					showCard('target', target[1]);
+				}
+
+				break;
+
+			case 'Wait':
+				confirmText = 'End turn?';
+				break;
+		}
 
 		textSpan.innerHTML = confirmText;
 
@@ -946,6 +1168,7 @@ window.onload = function() {
 	}
 
 
+	//Mueve personaje a nueva ubicación, después de haber confirmado
 	function moveSelect() {
 		prevPos = currentChar.charPos;
 		currentChar.charPos = currentTile;
@@ -962,6 +1185,7 @@ window.onload = function() {
 	}
 
 
+	//Realiza el ataque después de haber confirmado
 	function attackSelect() {
 		console.log('Revisar si hay un blanco en ' + currentTile);
 		let target = checkTile(currentTile, 'target');
@@ -970,6 +1194,30 @@ window.onload = function() {
 			console.log('Hay un blanco, determinar si el golpe conecta (por ahora, siempre va a conectar)');
 			console.log('Si conectó, determinar cuanto daño se hizo (por ahora, siempre bajará 5)');
 			characters[target[1]].hp -= 5;
+
+			if(characters[target[1]].hp <= 0) {
+				characters[target[1]].hp = 0;
+				characters[target[1]].cp = 0;
+
+				console.log();
+				console.log(enemyParty.includes(target[1]));
+
+				if(playerParty.includes(target[1])) {
+					for(let i = 0; i < playerParty.length; i++) {
+						if(playerParty[i] == target[1]) {
+							playerParty.splice(i, 1);
+						}
+					}
+				}
+
+				else if(enemyParty.includes(target[1])) {
+					for(let i = 0; i < enemyParty.length; i++) {
+						if(enemyParty[i] == target[1]) {
+							enemyParty.splice(i, 1);
+						}
+					}
+				}
+			}
 		}
 		else {
 			console.log('No hay blanco');
@@ -982,17 +1230,18 @@ window.onload = function() {
 
 		movementTiles = [];
 
+		currentChar.acted = 1;
+
+		drawGrid();//de mientras para ocultar las celdas de movimiento, debería quitarse con la animacón.
+
 		states.current = states.battleMenu;
 		states.prev = states.battleMenu;
 
-		currentChar.acted = 1;
-
-		hideMenus();
-
-		drawGrid();
+		checkState();
 	}
 
 
+	//Revisa si la baldosa especificada contiene a un blanco o si está dentro del rango de movimiento
 	function checkTile(tilePos, type) {
 		let result = [false];
 		switch(type) {
@@ -1028,6 +1277,7 @@ window.onload = function() {
 	}
 
 
+	//Muestra el rango de movimiento, o de ataque
 	function showRange(kind, char) {
 		let i = 0;
 		let targetTiles = [];
@@ -1054,7 +1304,7 @@ window.onload = function() {
 
 			case 'attack':
 				range = thisChar.attackRange;
-				tile = 2;
+				tile = 1;
 				break;
 		}
 
@@ -1078,12 +1328,32 @@ window.onload = function() {
 						//targetTiles[k][north] = 3;
 					}
 					else {
-						targetTiles[k][north] = tile;
+						if(kind == 'move') {
+							let tileCoords = [k, north];
+							let target = checkTile(tileCoords, 'target');
+
+							if(target[0] == false) {
+								targetTiles[k][north] = tile;
+							}
+						}
+						else {
+							targetTiles[k][north] = tile;
+						}
 					}
 				}
 			}
 			else {
-				targetTiles[west][north] = tile;
+				if(kind == 'move') {
+					let tileCoords = [west, north];
+					let target = checkTile(tileCoords, 'target');
+
+					if(target[0] == false) {
+						targetTiles[west][north] = tile;
+					}
+				}
+				else {
+					targetTiles[west][north] = tile;
+				}
 			}
 
 			if(north >= currentTile[1]) {
@@ -1096,12 +1366,13 @@ window.onload = function() {
 
 		movementTiles = targetTiles;
 
-		console.log(movementTiles);
+		//console.log(movementTiles);
 
 		drawGrid();
 	}
 
 
+	//Acciones a realizar cuando se presione el botón de cancelar
 	function cancelButton() {
 		switch(states.prev) {
 			case states.move:
@@ -1109,6 +1380,7 @@ window.onload = function() {
 				states.prev = states.battleMenu;
 				hideMenus();
 				showRange('move', 'current');
+				checkState();
 				break;
 
 			case states.battleMenu:
@@ -1117,28 +1389,38 @@ window.onload = function() {
 				states.current = states.battleMenu;
 				states.prev = states.explore;
 				hideMenus();
+				checkState();
 				break;
 
 			case states.action:
 			case states.attack:
 				hideMenus();
+				hideCards();
 				states.current = states.action;
 				states.prev = states.battleMenu;
 				movementTiles = [];
 				showMenu('battleMenu');
 				showMenu('actionMenu');
+				checkState();
 				break;
 
 			case states.explore:
 				movementTiles = [];
-				drawGrid();
 				states.current = states.explore;
+				states.prev = states.battleMenu;
+				hideMenus();
+				checkState();
+				break;
+
+			case states.faceSelection:
+				states.current = states.battleMenu;
+				states.prev = states.battleMenu;
 				hideMenus();
 				checkState();
 				break;
 		}
 
-		checkState();
+		//checkState();
 
 		//drawGrid();
 	}
@@ -1158,6 +1440,7 @@ window.onload = function() {
 		document.getElementById('char1Ct').innerHTML = char1.ct;
 		document.getElementById('char1Acted').innerHTML = char1.acted;
 		document.getElementById('char1Moved').innerHTML = char1.moved;
+		document.getElementById('char1Animation').innerHTML = char1.currentAnimation;
 
 		document.getElementById('char2Name').innerHTML = char2.name;
 		document.getElementById('char2Hp').innerHTML = char2.hp;
