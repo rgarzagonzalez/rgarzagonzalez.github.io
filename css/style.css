@@ -93,6 +93,12 @@
 	padding: 5px;
 }
 
+#anouncementMenu {
+	position:absolute;
+	top:30px;
+	left:50%;
+}
+
 .active {
 	background-color: #CFFFFF;
 }
@@ -116,4 +122,47 @@
 
 .current {
 	background-color: rgba(255,0,0,0.5);
+}
+
+#damageCont {
+	position:absolute;
+	top:100px;
+	left:70%;
+	font-weight:bold;
+	width:50px;
+	height:30px;
+	overflow:hidden;
+}
+
+#damageCont span{
+	display:inline-block;
+	float:left;
+	margin-right:2px;
+	padding-top:30px;
+}
+
+#hundreds.show {
+	animation-name: example;
+	animation-duration: 1.5s;
+}
+
+#tens.show {
+	animation-name: example;
+	animation-delay: 0.2s;
+	animation-duration: 1.5s;
+}
+
+#units.show {
+	animation-name: example;
+	animation-delay: 0.4s;
+	animation-duration: 1.5s;
+}
+
+@keyframes example {
+	0% {padding-top:30px;}
+	10% {padding-top:0px;}
+	20% {padding-top:10px;}
+	80% {padding-top:10px;}
+	90% {padding-top:0px;}
+	100% {padding-top:30px;}
 }

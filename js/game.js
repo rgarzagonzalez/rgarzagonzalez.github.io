@@ -1,124 +1,381 @@
-function Character(args) {
-	this.name = args[0];
-	
-	this.sprite = args[1];
-	this.width = args[2];
-	this.height = args[3];
-	this.offsetX = args[4];
-	this.offsetY = args[5];
-
-	this.lvl = args[6];
-	this.xp = args[7];
-
-	this.maxHp = args[8];
-	this.hp = args[8];
-	this.maxAp = args[9];
-	this.ap = args[9];
-
-	this.spd = args[10];
-	this.str = args[11];
-	this.def = args[12];
-	this.mAtk = args[13];
-	this.mDef = args[14];
-
-	this.movementRange = args[15];
-	this.attackRange = args[16];
-	this.minRange = args[17];
-	this.jump = args[18];
-
-	this.command = args[19];
-
-	this.currentAnimation = 0;
-	this.frame = 0;
-	this.animationFrames = args[20];
-
-	this.ct = 0;
-	this.cct = 0;
-
-	this.facing = 0;
-	this.charPos = [];
-	this.moved = 0;
-	this.acted = 0;
-	this.selectFacing = 0;
-}
-
-Character.prototype.animate = function() {
-	this.frame ++ ;
-
-	if(this.frame == this.animationFrames[this.currentAnimation].length) {
-		this.frame = 0;
-	}
-}
-
-function Sprite(animationFrames) {
-	this.frame = 0;
-	this.animationFrames;
-}
-
-let sprite_01 = new Image();
-let sprite_02 = new Image();
-let sprite_03 = new Image();
-let sprite_04 = new Image();
-let shadow = new Image();
-let arrowSprite = new Image();
+/*
+*	TO-DO:
+*		- Comandos especiales para cada personaje
+*		- Charge actions
+*			- Agregar al orden de turno
+*			- Área de efecto
+*		- Diferentes escenarios
+*
+*		- Corregir la función del turno enemigo
+*		- Corregir formula para evasión
+*		- Corregir formula para determinar cantidad de daño
+*		- Corregir stats
+*		- Posición de números de daño
+*	
+*		- Celdas de distintas alturas
+*		- Ganar niveles de experiencia
+*		- Salvar progreso
+*		- Cambiar formación antes de cada batalla
+*		- Daño elemental
+*		- Diálogo
+*		- Agregar un pueblo con tienda y posada
+*		- Rango mínimo en ataques con arco
+*		- Bloquear campo visual de ataques con arco
+*		- Sonido?
+*		- Arte:
+*			- Recibir daño
+*			- Muerte
+*			- Encantamiento
+*			- Item
+*			- FX
+*/
 
 
-let charList = [
-	[
-		'Monk', sprite_01, 204, 138, -45, -85, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Zen', 'Zen Punch'],
-		[
-			[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
-			[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
-			[0],
-			[0]
-		]
-	],
-	[
-		'Fighter', sprite_02, 108, 150, 4, -105, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
-		[
-			[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
-			[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
-			[0],
-			[0]
-		]
-	],
-	[
-		'Mage', sprite_03, 105, 130, 4, -80, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
-		[
-			[0],
-			[0],
-			[0],
-			[0]
-		]
-	],
-	[
-		'Slime', sprite_04, 102, 120, 6, -84, 1, 0, 100, 50, 3, 5, 5, 5, 5, 2, 1, 0, 0, [],
-		[
-			[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
-			[0],
-			[0],
-			[0]
-		]
-	]
-];
-
-
-let gridList = [
-	[
-		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-		[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-		[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
-	]
-];
+//Abilidades = Str, Dex, Con, Int, Wis, Cha, suma de 3d6(Roll twice, discard lowest)
 
 window.onload = function() {
+
+	let directions = {
+		north: 2,
+		south: 0,
+		east: 1,
+		west: 3
+	}
+
+	function Character(args) {
+		this.name = args[0];
+	
+		this.sprite = args[1];
+		this.width = args[2];
+		this.height = args[3];
+		this.offsetX = args[4];
+		this.offsetY = args[5];
+
+		this.lvl = args[6];
+		this.xp = args[7];
+
+		this.maxHp = args[8];
+		this.hp = args[8];
+		this.maxAp = args[9];
+		this.ap = args[9];
+
+		this.spd = args[10];
+		this.str = args[11];
+		this.def = args[12];
+		this.mAtk = args[13];
+		this.mDef = args[14];
+
+		this.movementRange = args[15];
+		this.attackRange = args[16];
+		this.itemRange = 2;
+		this.minRange = args[17];
+		this.jump = args[18];
+
+		this.command = args[19];
+
+		this.currentAnimation = 1;
+		this.frame = 0;
+		this.animationFrames = args[20];
+		this.animationPlaying = true;
+		this.animationLoop = true;
+
+		this.ct = 0;
+		this.cct = 0;	//Se usa para la función que calcula los próximos turnos
+
+		this.facing = 1;	//Hacia donde está viendo
+		this.charPos = [];	//Celda donde se encuentra el personaje
+		this.moved = 0;	//Ya se movio?
+		this.acted = 0;	//Ya actuó?
+		this.selectFacing = 0;	//Se está cambiando la dirección?
+		this.tileValues = [];	//Cuales celdas estan al frente, detrás y al costado
+	}
+
+	Character.prototype.animate = function() {
+		if(this.animationPlaying == true) {
+			this.frame ++ ;
+
+			if(this.frame == this.animationFrames[this.currentAnimation].length) {
+				if(this.animationLoop == true) {
+					this.frame = 0;
+				}
+				else {
+					this.frame = this.animationFrames[this.currentAnimation].length - 1;
+					this.animationPlaying = false;
+
+					//Si la animación fue la de ataque
+					if(this.currentAnimation > 3 && this.currentAnimation < 8) {
+						this.acted = 1;
+						checkState();
+					}
+				}
+			}
+		}
+	}
+
+	Character.prototype.playAnimation = function(animation) {
+		this.animationLoop = false;
+		this.frame = 0;
+
+		switch(animation) {
+			case 'attack':
+				this.currentAnimation = this.facing + 4;
+				break;
+		}
+	}
+
+	Character.prototype.calculateTileValues = function(width, height) {
+		this.tileValues = [];
+
+		switch(this.facing) {
+			case 0:
+			case 2:
+				//Norte o sur
+				for(let y = 0; y < height; y++) {
+					this.tileValues[y] = [];
+					for(x = 0; x < width; x++) {
+
+						//Distancia entre personaje y fila que se está evaluando
+						let yDiff = this.charPos[1] - y;
+
+						//No es la fila donde está el personaje
+						if(yDiff != 0) {
+
+							//Dentro de este rango no es al costado
+							if(x >= this.charPos[0] - Math.abs(yDiff) && x <= this.charPos[0] + Math.abs(yDiff)) {
+
+								//La fila está sur del personaje
+								if(yDiff < 0) {
+
+									//Personaje viendo al sur
+									if(this.facing == 0) {
+										this.tileValues[y][x] = 'front';
+									}
+
+									//Personaje viendo al norte
+									else if(this.facing == 2) {
+										this.tileValues[y][x] = 'back';
+									}
+								}
+
+								//La fila está al norte del personaje
+								else if (yDiff > 0) {
+
+									//Personaje viendo al sur
+									if(this.facing == 0) {
+										this.tileValues[y][x] = 'back';
+									}
+
+									//Personaje viendo al norte
+									else if(this.facing == 2) {
+										this.tileValues[y][x] = 'front';
+									}
+								}
+							}
+
+							else {
+								this.tileValues[y][x] = 'side';
+							}
+						}
+
+						//Misma fila que el personaje. Todas las celdas son de costado, excepto en la posición del personaje
+						else {
+							if(x != this.charPos[0]) {
+								this.tileValues[y][x] = 'side';
+							}
+						}
+					}
+				}
+
+				break;
+
+			case 1:
+			case 3:
+				//Este u oeste
+				for(let y = 0; y < height; y++) {
+					this.tileValues[y] = [];
+					for(x = 0; x < width; x++) {
+
+						//Distancia entre el personaje y la fila que se está evaluando
+						let yDiff = this.charPos[1] - y;
+						let xDiff = Math.abs(yDiff) - 1;
+
+						//No es la fila donde está el personaje
+						if(yDiff != 0) {
+
+							//Dentro de este rango es el costado
+							if(x >= this.charPos[0] - xDiff && x <= this.charPos[0] + xDiff) {
+								this.tileValues[y][x] = 'side';
+							}
+
+							//Fuera del rango es adelante o atrás
+							else {
+
+								//La celda está al Oeste del personaje
+								if(x < this.charPos[0]) {
+
+									//Si el personaje está viendo al este, esta celda está detrás de él
+									if(this.facing == 1) {
+										this.tileValues[y][x] = 'back';
+									}
+
+									//Si el personaje está viendo al oeste, esta celda está frente a él
+									else if(this.facing == 3) {
+										this.tileValues[y][x] = 'front';
+									}
+								}
+
+								//La celda está al Este del personaje
+								else if(x > this.charPos[0]) {
+
+									//Si el personaje también está viendo al este, esta celda está delante de él
+									if(this.facing == 1) {
+										this.tileValues[y][x] = 'front';
+									}
+
+									//Si el personaje está viendo al oeste, esta celda está detrás de él
+									else if(this.facing == 3) {
+										this.tileValues[y][x] = 'back';
+									}
+								}
+							}
+						}
+
+						//La misma fila donde está el personaje
+						else {
+
+							//Si no es la misma celda donde está el personaje
+							if(x != this.charPos[0]) {
+
+								//La celda está al oeste
+								if(x < this.charPos[0]) {
+
+									//El personaje está viendo al este, la celda está detrás de él
+									if(this.facing == 1) {
+										this.tileValues[y][x] = 'back';
+									}
+
+									//El personaje esta viendo al oeste, la celda está frente a él
+									else if(this.facing == 3) {
+										this.tileValues[y][x] = 'front';
+									}
+								}
+
+								//La celda está al este
+								else if(x > this.charPos[0]) {
+
+									//El personaje está viendo al este, la celda está frente a él
+									if(this.facing == 1) {
+										this.tileValues[y][x] = 'front';
+									}
+
+									//El personaje está viendo al oeste, la celda está detrás de él
+									else if(this.facing == 3) {
+										this.tileValues[y][x] = 'back';
+									}
+								}
+							}
+						}
+					}
+				}
+
+				break;
+
+		}
+	}
+
+	function Sprite(animationFrames) {
+		this.frame = 0;
+		this.animationFrames;
+	}
+
+	let sprite_01 = new Image();
+	let sprite_02 = new Image();
+	let sprite_03 = new Image();
+	let sprite_04 = new Image();
+	let shadow = new Image();
+	let arrowSprite = new Image();
+
+
+	let charList = [
+		[
+			'Monk', sprite_01, 204, 138, -45, -85, 1, 0, 100, 50, 6, 5, 5, 5, 5, 2, 1, 0, 0, ['Zen', 'Zen Punch'],
+			[
+				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+				[0],
+				[0],
+				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
+				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
+				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2]
+			]
+		],
+		[
+			'Fighter', sprite_02, 108, 150, 4, -104, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
+			[
+				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0]
+			]
+		],
+		[
+			'Mage', sprite_03, 105, 130, 4, -81, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
+			[
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0]
+			]
+		],
+		[
+			'Slime', sprite_04, 102, 140, 6, -84, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, [],
+			[
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]
+			]
+		]
+	];
+
+
+	let gridList = [
+		[
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
+		]
+	];
+
+	let inventory = {
+		potion: [5, 'hpUp', 30],
+		elixir: [3, 'apUp', 10],
+		hiPotion: [0, 'hpUp', 50]
+	}
+
+	let itemToUse = '';
+
+
 	let canvasCart = document.getElementById('gameCanvasCart');
 	let cCart = canvasCart.getContext('2d');
 
@@ -193,8 +450,14 @@ window.onload = function() {
 		explore: 6,
 		showOtherRange: 7,
 		enemyTurn: 8,
-		faceSelection : 9,
-		battleOver: 10
+		faceSelection: 9,
+		resolveAttack: 10,
+		anouncement: 11,
+		list: 12,
+		itemUsage: 13,
+		resolveItem: 14,
+		battleOver: 15
+
 	}
 
 	let movementTiles = [];
@@ -212,16 +475,20 @@ window.onload = function() {
 	}
 
 	let char1 = new Character(charList[0]);
-	char1.charPos = [1,4];
+	char1.charPos = [4,6];
+	char1.calculateTileValues(gridWidth, gridHeight);
 
 	let char2 = new Character(charList[1]);
-	char2.charPos = [4,4];
+	char2.charPos = [3,5];
+	char2.calculateTileValues(gridWidth, gridHeight);
 
 	let char3 = new Character(charList[2]);
-	char3.charPos = [5,1];
+	char3.charPos = [3,7];
+	char3.calculateTileValues(gridWidth, gridHeight);
 
 	let char4 = new Character(charList[3]);
-	char4.charPos = [4, 6];
+	char4.charPos = [6,6];
+	char4.calculateTileValues(gridWidth, gridHeight);
 
 	let characters = [char1, char2, char3, char4];
 
@@ -241,6 +508,7 @@ window.onload = function() {
 
 
 
+	//Revisa que los elementos hayan cargado para iniciar el juego
 	function assetLoaded() {
 		assets++;
 		
@@ -269,7 +537,10 @@ window.onload = function() {
 					break;
 
 				case states.battleMenu:
+					states.prev = states.explore;
 					currentChar.selectFacing = 0;
+					currentChar.calculateTileValues(gridWidth, gridHeight);
+					currentTile = currentChar.charPos;
 					centerCamera(currentTile[0], currentTile[1], 1);
 					showCard('current', turno[0]);
 					menuHandler(states.current);
@@ -278,7 +549,11 @@ window.onload = function() {
 
 				case states.action:
 					currentTile = currentChar.charPos;
+					movementTiles = [];
 					centerCamera(currentTile[0], currentTile[1], 1);
+					showMenu('battleMenu');
+					showMenu('actionMenu');
+					break;
 
 				case states.explore:
 					exploreField();
@@ -296,6 +571,14 @@ window.onload = function() {
 				case states.enemyTurn:
 					enemyTurn(turno[0]);
 					break;
+
+				case states.resolveAttack:
+					resolveAction('attack');
+					break;
+
+				case states.resolveItem:
+					resolveAction('item');
+					break;
 			}
 		}
 		else {
@@ -306,15 +589,13 @@ window.onload = function() {
 	}
 
 
-	function enemyTurn(enemy) {
-		//console.log('centrar camara en enemigo');
-		centerCamera(currentTile[0], currentTile[1], 1);
-		console.log('inicia Turno Enemigo');
-		console.log('Evaluar Situacion');
-		console.log('Buscar blanco más cercano');
+	//Regresa un objeto con información sobre las distancias entre el enemigo y los personajes
+	function getDistances(enemy) {
 
+		showRange('move', 'current');
 		let distances = [];
-		//Calcular la distancia a cada uno de los miembros del grupo
+
+		//Calcular la distancia entre el enemigo y cada uno de los miembros del grupo
 		for(let i = 0; i < playerParty.length; i++) {
 			let distance = calculateDistance(characters[enemy].charPos, characters[playerParty[i]].charPos);
 			distances.push(distance);
@@ -323,38 +604,292 @@ window.onload = function() {
 		//Determinar cuál es el más cercano
 		let closest = distances.indexOf(Math.min(...distances));
 
-		showRange('move', 'current');
+		//Determinar distancia actual al blanco
+		let currentDistance = distances[closest];
 
+		//Más prioridad a las que se encuantren detrás o al lado del blanco
+		if(characters[closest].tileValues[characters[enemy].charPos[1]][characters[enemy].charPos[0]] == 'side') {
+			currentDistance -= 0.1;
+		}
+		else if(characters[closest].tileValues[characters[enemy].charPos[1]][characters[enemy].charPos[0]] == 'back') {
+			currentDistance -= 0.2;
+		}
+
+		
 		let rangeDistances = [];
 		let rangeDistancesIndexes = [];
 
+		let rangeDistancesSum = [];
+		let rangeDistancesSumIndexes = [];
+
 		let moveKeysX = Object.keys(movementTiles);
 
-		//Calcular la distancia entre el blanco y las baldosas dentro del rango de movimiento
+		//Calcular la distancia entre cada baldosa del rango de movimiento y los personajes del grupo
 		for(let i = 0; i < moveKeysX.length; i++) {
-			//rangeDistances[moveKeysX[i]] = [];
+
 			let moveKeysY = Object.keys(movementTiles[moveKeysX[i]]);
 
 			for(let j = 0; j < moveKeysY.length; j++) {
 				let coords = [moveKeysX[i], moveKeysY[j]];
-				let rangeDistance = calculateDistance(coords, characters[playerParty[closest]].charPos);
-				console.log('distancia' + rangeDistance);
-				//rangeDistances[moveKeysX[i]][moveKeysY[j]] = rangeDistance;
-				rangeDistances.push(rangeDistance);
-				rangeDistancesIndexes.push(coords);
+				let rangeDistanceSum = 0;
+
+
+				for(let k = 0; k < playerParty.length; k++) {
+
+					//Suma de la distancia combinada a todos los blancos
+					rangeDistanceSum += calculateDistance(coords, characters[playerParty[k]].charPos);
+
+					//Distancia solo al personaje más cercano
+					if(k == closest) {
+						let rangeDistance = calculateDistance(coords, characters[playerParty[closest]].charPos);
+
+						//Más prioridad a las que se encuentren detrás o al lado del blanco
+						if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'side') {
+							rangeDistance -= 0.1;
+						}
+						else if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'back') {
+							rangeDistance -= 0.2;
+						}
+
+						rangeDistances.push(rangeDistance);
+						rangeDistancesIndexes.push(coords);
+
+					}
+				}
+
+				rangeDistancesSum.push(rangeDistanceSum);
+				rangeDistancesSumIndexes.push(coords);
 			}
 		}
 
 		let closestDistance = rangeDistances.indexOf(Math.min(...rangeDistances));
+		let longestDistance = rangeDistances.indexOf(Math.max(...rangeDistances));
+		let longestCombinedDistance = rangeDistancesSum.indexOf(Math.max(...rangeDistancesSum));
 
-		setTimeout(function(){
-			let x = parseInt(rangeDistancesIndexes[closestDistance][0]);
-			let y = parseInt(rangeDistancesIndexes[closestDistance][1]);
-			currentTile = [x, y];
-			//drawGrid();
-			centerCamera(x, y, 1);
-			moveSelect();
-		}, 1000);
+		movementTiles = [];
+
+		let distanceObject = {
+			currentDistance: currentDistance,
+			closest: closest,
+			rangeDistances: rangeDistances,
+			rangeDistancesIndexes: rangeDistancesIndexes,
+			rangeDistancesSumIndexes: rangeDistancesSumIndexes,
+			closestDistance: closestDistance,
+			longestDistance: longestDistance,
+			longestCombinedDistance: longestCombinedDistance
+		}
+
+		return distanceObject;
+	}
+
+
+	//Regresa la dirección hacia la cual debe voltear al terminar el turno
+	function evaluateFacing() {
+		let directions = [1, 1, 1, 1];
+
+		for(let i = 0; i < 4; i++) {
+			currentChar.facing = i;
+			currentChar.calculateTileValues(gridWidth, gridHeight);
+
+			for(let j = 0; j < playerParty.length; j++) {
+				if(currentChar.tileValues[characters[playerParty[j]].charPos[1]][characters[playerParty[j]].charPos[0]] == 'side') {
+					directions[i] -= 0.1;
+				}
+				else if(currentChar.tileValues[characters[playerParty[j]].charPos[1]][characters[playerParty[j]].charPos[0]] == 'back') {
+					directions[i] -= 0.2;
+				}
+			}
+		}
+
+		let directionToFace = directions.indexOf(Math.max(...directions));
+
+		return directionToFace;
+	}
+
+
+	//Acciones que toman los enemigos cuando es su turno.
+	function enemyTurn(enemy) {
+		console.log('inicia Turno Enemigo');
+		console.log(currentChar.tileValues.length + '<- array de valores');
+		centerCamera(currentTile[0], currentTile[1], 1);
+
+		hideMenus();
+
+		distanceInfo = getDistances(enemy);
+
+		//Ya se movió
+		if(currentChar.moved == 1) {
+
+			if(currentChar.acted == 1) {
+				console.log('Ya actuó también, esperar');
+
+				setTimeout(function() {
+					let whereToTurn = evaluateFacing();
+					currentChar.facing = whereToTurn;
+					currentChar.currentAnimation = whereToTurn;
+					currentChar.frame = 0;
+					currentChar.calculateTileValues(gridWidth, gridHeight);
+
+					setTimeout(function() {
+						currentChar.moved = 0;
+						currentChar.acted = 0;
+						currentChar.ct = 0;
+						currentChar = '';
+						turno.shift();
+						checkTurn();
+					}, 200);
+				}, 200);
+			}
+			else {
+				console.log('No ha actuado aún');
+
+				//Agregar función que regrese si puede o no curarse
+				let canHeal = false;
+
+				if(distanceInfo.currentDistance <= currentChar.attackRange) {
+					console.log('blanco dentro de rango de ataque');
+
+					setTimeout(function(){
+						showRange('attack', 'current');
+
+						setTimeout(function(){
+							currentTile = [characters[playerParty[distanceInfo.closest]].charPos[0], characters[playerParty[distanceInfo.closest]].charPos[1]];
+							centerCamera(currentTile[0], currentTile[1], 1);
+
+							setTimeout(function() {
+								movementTiles = [];
+								drawGrid();
+								states.current = states.resolveAttack;
+								states.prev = states.resolveAttack;
+								checkState();
+							}, 200);
+						},200);
+					}, 300);
+				}
+				else {
+					console.log('blanco fuera de rango de ataque');
+					if(canHeal) {
+						//curarse
+					}
+					else {
+						console.log('No se puede curar, terminar turno');
+
+						setTimeout(function() {
+							let whereToTurn = evaluateFacing();
+							currentChar.facing = whereToTurn;
+							currentChar.currentAnimation = whereToTurn;
+							currentChar.frame = 0;
+							currentChar.calculateTileValues(gridWidth, gridHeight);
+
+							setTimeout(function() {
+								currentChar.moved = 0;
+								currentChar.acted = 0;
+								currentChar.ct = 0;
+								currentChar = '';
+								turno.shift();
+								checkTurn();
+							}, 200);
+						}, 200);
+					}
+				}
+
+			}
+		}
+
+		//No se ha movido
+		else {
+
+			//Ya actuó
+			if(currentChar.acted == 1) {
+				console.log('Ya actuó');
+				showRange('move', 'current');
+
+				//Opción para que se quede ahí?
+
+				//De mientras que se aleje
+				let x = parseInt(distanceInfo.rangeDistancesSumIndexes[distanceInfo.longestCombinedDistance][0]);
+				let y = parseInt(distanceInfo.rangeDistancesSumIndexes[distanceInfo.longestCombinedDistance][1]);
+
+
+				setTimeout(function() {
+					currentTile = [x, y];
+					drawGrid();
+
+					setTimeout(function(){
+						movementTiles = [];
+						moveSelect();
+					}, 350);
+				}, 350);
+			}
+
+			//No ha actuado
+			else {
+
+				//Ya está en el mejor lugar disponible. Actuar
+				if(distanceInfo.currentDistance <= distanceInfo.rangeDistances[distanceInfo.closestDistance]) {
+					let canHeal = false;
+
+					if(currentChar.hp < currentChar.maxHp * 0.15) {
+						//Revisar si se puede curar y si es el caso, cambiar variable canHeal a true
+					}
+
+					if(canHeal) {
+						//Curarse
+					}
+					else {
+						setTimeout(function() {
+							showRange('attack', 'current');
+
+							setTimeout(function() {
+								currentTile = [characters[playerParty[distanceInfo.closest]].charPos[0], characters[playerParty[distanceInfo.closest]].charPos[1]];
+								centerCamera(currentTile[0], currentTile[1], 1);
+
+								setTimeout(function() {
+									movementTiles = [];
+									drawGrid();
+									states.current = states.resolveAttack;
+									states.prev = states.resolveAttack;
+									checkState();
+								}, 200);
+							}, 200);
+						}, 500);
+					}
+				}
+
+				//Hay que moverse
+				else {
+					let x;
+					let y;
+					
+					console.log('Hay que moverse');
+					//Poco hp, escapar
+					if(currentChar.hp < currentChar.maxHp * 0.15) {
+						x = parseInt(distanceInfo.rangeDistancesIndexes[distanceInfo.longestDistance][0]);
+						y = parseInt(distanceInfo.rangeDistancesIndexes[distanceInfo.longestDistance][1]);
+					}
+
+					//Suficiente hp, acercarse para atacar
+					else {
+						x = parseInt(distanceInfo.rangeDistancesIndexes[distanceInfo.closestDistance][0]);
+						y = parseInt(distanceInfo.rangeDistancesIndexes[distanceInfo.closestDistance][1]);
+					}
+
+					setTimeout(function(){
+						showRange('move', 'current');
+
+						setTimeout(function() {
+							currentTile = [x, y];
+							drawGrid();
+
+							setTimeout(function(){
+								movementTiles = [];
+								moveSelect();
+							}, 350);
+						}, 350);
+					}, 500);
+				}
+			}
+		}
 	}
 
 
@@ -428,6 +963,7 @@ window.onload = function() {
 	}
 
 
+	//Centra el tablero en una posicióne specificada
 	function centerCamera(x, y, animated) {
 		if(animated == 1) {
 			let xOffsetNew = (((x - y) * (tileWidth / 2)) * -1) + ((canvasIso.width / 2) - (tileWidth / 2) );
@@ -588,7 +1124,7 @@ window.onload = function() {
 			cCart.fill();
 
 			//dibujar personajes en retícula isométrica
-			cChars.drawImage(shadow, 0, 0, 56, 22, cordsIso[0] + 28, cordsIso[1] + 25, 56, 20);
+			cChars.drawImage(shadow, 0, 0, 56, 20, cordsIso[0] + 28, cordsIso[1] + 24, 56, 20);
 			cChars.drawImage(sprite, currentFrame * width, (currentAnimation * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
 
 			if(characters[char] == currentChar) {
@@ -656,6 +1192,7 @@ window.onload = function() {
 	}
 
 
+	//Muestra los menús correspondientes a cada estado del juego
 	function menuHandler(state) {
 		//hideMenus();
 		switch(state) {
@@ -670,6 +1207,7 @@ window.onload = function() {
 
 			case states.confirm:
 				showMenu('confirmMenu');
+				break;
 		}
 	}
 
@@ -713,6 +1251,7 @@ window.onload = function() {
 	}
 
 
+	//Coloca la baldosa correspondiente a cada coordenada
 	function placeTile(tileKind, x, y) {
 		let posYCart = y * tileHeight;
 		let posXCart = x * tileHeight;
@@ -725,7 +1264,7 @@ window.onload = function() {
 			case 0:
 				cCart.fillStyle = '#00FF00';
 				sx = 0;
-				sy = 0;
+				sy = 1;
 				break;
 
 			case 1:
@@ -769,6 +1308,12 @@ window.onload = function() {
 				sx = 3;
 				sy = 1;
 				break;
+
+			case 8:
+				cCart.fillStyle = 'yellow';
+				sx = 0;
+				sy = 0;
+				break;
 		}
 
 		//place cart tile
@@ -792,6 +1337,7 @@ window.onload = function() {
 	}
 
 
+	//Acciones que se deben tomar al presionar una tecla
 	function keyDownHandler(e) {
 		switch(e.keyCode) {
 			case Keys.UP:
@@ -829,6 +1375,9 @@ window.onload = function() {
 	function move(direction){
 		switch(states.current) {
 			case states.explore:
+			case states.move:
+			case states.attack:
+			case states.itemUsage:
 				moveTile(direction);
 				break;
 
@@ -836,18 +1385,8 @@ window.onload = function() {
 				moveMenu('battleMenu', direction);
 				break;
 
-			case states.move:
-				//moveTargetTile(direction);
-				moveTile(direction);
-				break;
-
 			case states.action:
 				moveMenu('actionMenu', direction);
-				break;
-
-			case states.attack:
-				moveTile(direction);
-				//moveTargetTile(direction);
 				break;
 
 			case states.confirm:
@@ -856,6 +1395,10 @@ window.onload = function() {
 
 			case states.faceSelection:
 				selectDirection(direction);
+				break;
+
+			case states.list:
+				moveMenu('listMenu', direction);
 				break;
 		}
 	}
@@ -936,6 +1479,7 @@ window.onload = function() {
 	}
 
 
+	//Mueve el cursor por las distintas celdas
 	function moveTile(direction) {
 		hideCards();
 		let x = currentTile[0];
@@ -1007,6 +1551,14 @@ window.onload = function() {
 				}
 				break;
 
+			case states.itemUsage:
+				let targetItem = checkTile(currentTile, 'move');
+				if(targetItem[0] == true) {
+					states.prev = states.itemUsage;
+					confirmAction('Item');
+				}
+				break;
+
 			case states.confirm:
 				menuSelect('confirmMenu');
 				break;
@@ -1034,6 +1586,15 @@ window.onload = function() {
 				states.prev = states.faceSelection;
 				confirmAction('Wait');
 				break;
+
+			case states.anouncement:
+				states.current = states.prev;
+				checkState();
+				break;
+
+			case states.list:
+				menuSelect('listMenu');
+				break;
 		}
 	}
 
@@ -1043,10 +1604,12 @@ window.onload = function() {
 		let menuOptions = menuName + '_options';
 		let menu = document.getElementById(menuOptions);
 		let currentMenu;
+		let menuId;
 
 		for(let i = 0; i < menu.childNodes.length; i++) {
 			if(menu.childNodes[i].classList && menu.childNodes[i].classList.contains('active') && !menu.childNodes[i].classList.contains('off')) {
-				currentMenu = menu.childNodes[i].id;
+				currentMenu = menu.childNodes[i].getAttribute('name');
+				menuId = menu.childNodes[i].id;
 				break;
 			}
 		}
@@ -1075,6 +1638,18 @@ window.onload = function() {
 				console.log('special');
 				break;
 
+			case 'item':
+				showList('items');
+				break;
+
+			case 'listItem':
+				itemToUse = menuId;
+				states.current = states.itemUsage;
+				states.prev = states.action;
+				hideMenus();
+				showRange('item', 'current');
+				break;
+
 			case 'wait':
 				states.prev = states.battleMenu;
 				states.current = states.faceSelection;
@@ -1082,51 +1657,100 @@ window.onload = function() {
 				break;
 
 			case 'cancel':
-				if(states.prev == states.move) {
-					states.current = states.move;
-					states.prev = states.battleMenu;
-					hideMenus();
-					showRange('move', 'current');
-					centerCamera(currentTile[0], currentTile[1], 0);
+				switch(states.prev) {
+					case states.move:
+						states.current = states.move;
+						states.prev = states.battleMenu;
+						hideMenus();
+						showRange('move', 'current');
+						centerCamera(currentTile[0], currentTile[1], 0);
+						break;
+
+					case states.attack:
+					case states.itemUsage:
+						states.current = states.action;
+						itemToUse = '';
+						hideMenus();
+						hideCards();
+						checkState();
+						break;
+
+					case states.faceSelection:
+						states.current = states.battleMenu;
+						states.prev = states.battleMenu;
+						hideMenus();
+						checkState();
+						break;
 				}
-				else if(states.prev == states.attack) {
-					states.current = states.action;
-					hideMenus();
-					hideCards();
-					movementTiles = [];
-					currentTile = currentChar.charPos;
-					centerCamera(currentTile[0], currentTile[1], 0);
-					showMenu('battleMenu');
-					showMenu('actionMenu');
-					drawGrid();
-				}
-				else if(states.prev == states.faceSelection) {
-					states.current = states.battleMenu;
-					states.prev = states.battleMenu;
-					hideMenus();
-					checkState();
-				}
+
 				break;
 
 			case 'confirm':
-				if(states.prev == states.move) {
-					moveSelect();
+				switch(states.prev) {
+					case states.move:
+						moveSelect();
+						break;
+
+					case states.attack:
+						states.current = states.resolveAttack;
+						states.prev = states.resolveAttack;
+						checkState();
+						break;
+
+					case states.itemUsage:
+						states.current = states.resolveItem;
+						states.prev = states.resolveAttack;
+						checkState();
+						break;
+
+					case states.faceSelection:
+						//Fin del turno
+						currentChar.moved = 0;
+						currentChar.acted = 0;
+						currentChar.ct = 0;
+						currentChar = '';
+						document.getElementById('move').classList.remove('off');
+						document.getElementById('act').classList.remove('off');
+						hideMenus();
+						turno.shift();
+						checkTurn();
+						break;
 				}
-				else if(states.prev == states.attack) {
-					attackSelect();
+				break;
+		}
+	}
+
+
+	//
+	function showList(kind) {
+		switch(kind) {
+			case 'items':
+				console.log('Lista de items');
+				let itemKeys = Object.keys(inventory);
+				let listTxt = '';
+				console.log(inventory);
+
+				for(let i = 0; i < itemKeys.length; i++) {
+					if(inventory[itemKeys[i]][0] > 0) {
+						listTxt += '<li name="listItem" id="' + itemKeys[i] + '"';
+
+						if(i == 0) {
+							listTxt += ' class="active" ';
+						}
+
+						listTxt += '>' + itemKeys[i] + ': ' + inventory[itemKeys[i]][0] + '</li>';
+					}
 				}
-				else if(states.prev == states.faceSelection) {
-					//Fin del turno
-					currentChar.moved = 0;
-					currentChar.acted = 0;
-					currentChar.ct = 0;
-					currentChar = '';
-					document.getElementById('move').classList.remove('off');
-					document.getElementById('act').classList.remove('off');
-					hideMenus();
-					turno.shift();
-					checkTurn();
-				}
+
+				var list = document.getElementById('listMenu_options');
+
+				list.innerHTML = listTxt;
+
+				states.current = states.list;
+				states.prev = states.action;
+
+				showMenu('listMenu');
+
 				break;
 		}
 	}
@@ -1143,6 +1767,7 @@ window.onload = function() {
 				break;
 
 			case 'Attack':
+			case 'Item':
 				confirmText = 'Perform this action';
 
 				//Revisar si hay un blanco en la baldosa seleccionada
@@ -1173,9 +1798,18 @@ window.onload = function() {
 		prevPos = currentChar.charPos;
 		currentChar.charPos = currentTile;
 		movementTiles = [];
+		currentChar.calculateTileValues(gridWidth, gridHeight);
 
-		states.current = states.battleMenu;
-		states.prev = states.battleMenu;
+
+		if(playerParty.includes(turno[0])) {
+			states.current = states.battleMenu;
+			states.prev = states.battleMenu;
+		}
+
+		else {
+			states.current = states.enemyTurn;
+			states.prev = states.enemyTurn;
+		}
 
 		currentChar.moved = 1;
 
@@ -1185,59 +1819,274 @@ window.onload = function() {
 	}
 
 
-	//Realiza el ataque después de haber confirmado
-	function attackSelect() {
-		console.log('Revisar si hay un blanco en ' + currentTile);
-		let target = checkTile(currentTile, 'target');
+	//Muestra mensajes
+	function showAnouncement(str) {
+		document.getElementById('anouncementText').innerHTML = str;
+		showMenu('anouncementMenu');
+	}
+
+
+	//Muestra el daño y resta esa cantidad al hp del blanco
+	function showDamage(kind, damage, target) {
+		//Cambiar color dependiendo si se está haciendo daño o curando
+		switch(kind) {
+			case 'damage':
+				document.getElementById('damageCont').style.color = 'white';
+				break;
+
+			case 'hpUp':
+				document.getElementById('damageCont').style.color = 'blue';
+				break;
+
+			case 'apUp':
+				document.getElementById('damageCont').style.color = 'green';
+				break;
+		}
+
+		console.log(characters[target].charPos);
+		let caca = cartToIso(characters[target].charPos[0], characters[target].charPos[0]);
+		console.log(caca);
+
+		let txt = damage.toString();
+
+		let units = document.getElementById('units');
+		let tens = document.getElementById('tens');
+		let hundreds = document.getElementById('hundreds');
+
+		units.innerHTML = txt[txt.length - 1];
+		units.classList.add('show');
 		
-		if(target[0] == true) {
-			console.log('Hay un blanco, determinar si el golpe conecta (por ahora, siempre va a conectar)');
-			console.log('Si conectó, determinar cuanto daño se hizo (por ahora, siempre bajará 5)');
-			characters[target[1]].hp -= 5;
+		if(damage > 9) {
+			tens.innerHTML = txt[txt.length - 2];
+			tens.classList.add('show');
+		}
+		
+		if(damage > 99) {
+			hundreds.innerHTML = txt[txt.length - 3];
+			hundreds.classList.add('show');
+		}
 
-			if(characters[target[1]].hp <= 0) {
-				characters[target[1]].hp = 0;
-				characters[target[1]].cp = 0;
+		setTimeout(function() {
 
-				console.log();
-				console.log(enemyParty.includes(target[1]));
+			//Quitar clase que muestra los numeros
+			units.classList.remove('show');
+			tens.classList.remove('show');
+			hundreds.classList.remove('show');
 
-				if(playerParty.includes(target[1])) {
-					for(let i = 0; i < playerParty.length; i++) {
-						if(playerParty[i] == target[1]) {
-							playerParty.splice(i, 1);
+			//Se suma o se resta?
+			switch(kind) {
+				case 'damage':
+					characters[target].hp -= damage;
+
+					if(characters[target].hp < 0) {	//Si muere
+
+						characters[target].hp = 0;
+						characters[target].cp = 0;
+						//Animación de muerte?
+
+						//Revisar a que grupo pertenece
+						if(playerParty.includes(target)) {	//Está en el grupo del jugador
+							for(let i = 0; i < playerParty.length; i++) {
+								if(playerParty[i] == target) {
+									playerParty.splice(i, 1);
+								}
+							}
+						}
+
+						else if(enemyParty.includes(target)) {	//Está en el grupo de los enemigos
+							for(let i = 0; i < enemyParty.length; i++) {
+								if(enemyParty[i] == target) {
+									enemyParty.splice(i, 1);
+								}
+							}
+						}
+					}
+					break;
+
+				case 'hpUp':
+					characters[target].hp += damage;
+
+					if(characters[target].hp > characters[target].maxHp) {
+						characters[target].hp = characters[target].maxHp;
+					}
+
+					break;
+
+				case 'apUp':
+					characters[target].ap += damage;
+
+					if(characters[target].ap > characters[target].maxAp) {
+						characters[target].ap = characters[target].maxAp;
+					}
+
+					break;
+			}
+
+			//Ganar xp?
+
+			if(playerParty.includes(turno[0])) {	//Turno del jugador, mostrar el menú
+				states.current = states.battleMenu;
+				states.prev = states.battleMenu;
+			}
+			else {	//Sigue siendo turno del enemigo
+				states.prev = states.enemyTurn;
+				states.current = states.enemyTurn;
+			}
+
+			checkState();
+		}, 1500);
+	}
+
+
+	//Realiza las acciones después de haber confirmado
+	function resolveAction(kind) {
+		hideMenus();
+		movementTiles = [];
+		drawGrid();
+
+		//No se ha realizado la acción, voltear al personaje hacia donde se está atacando
+		if(currentChar.acted == 0) {
+
+			//Solo girar si no está ya viendo en la dirección correcta
+			if(currentChar.tileValues[currentTile[1]][currentTile[0]] != 'front') {
+
+				//El blanco esta a un lado, girar 90 grados
+				if(currentChar.tileValues[currentTile[1]][currentTile[0]] == 'side') {
+
+					//Si está viendo al norte o sur, girar al este u oeste
+					if(currentChar.facing == directions.north || currentChar.facing == directions.south) {
+
+						//El blanco se encuantra al este
+						if(currentTile[0] > currentChar.charPos[0]) {
+							currentChar.facing = directions.east;
+						}
+
+						//El blanco se encuentra al oeste
+						else {
+							currentChar.facing = directions.west;
+						}
+					}
+
+					//Si está viendo al este u oeste, girar al norte o sur
+					else {
+
+						//El blanco está al sur
+						if(currentTile[1] > currentChar.charPos[1]) {
+							currentChar.facing = directions.south;
+						}
+
+						//El blanco está al norte
+						else {
+							currentChar.facing = directions.north;
 						}
 					}
 				}
 
-				else if(enemyParty.includes(target[1])) {
-					for(let i = 0; i < enemyParty.length; i++) {
-						if(enemyParty[i] == target[1]) {
-							enemyParty.splice(i, 1);
-						}
+				//El blanco está atrás, girar 180 grados
+				else if(currentChar.tileValues[currentTile[1]][currentTile[0]] == 'back') {
+					switch(currentChar.facing) {
+
+						//Está viendo al norte, voltear al sur
+						case directions.north:
+							currentChar.facing = directions.south;
+							break;
+
+						//Está viendo al sur, voltear al norte
+						case directions.south:
+							currentChar.facing = directions.north;
+							break;
+
+						//Está viendo al este, voltear al oeste
+						case directions.east:
+							currentChar.facing = directions.west;
+							break;
+
+						//Está viendo al oeste, voltear al este
+						case directions.west:
+							currentChar.facing = directions.east;
+							break;
 					}
 				}
 			}
+
+			if(kind == 'attack') {
+				currentChar.playAnimation('attack');
+			}
+			else if (kind == 'item') {
+				//Actualizar cuando haya animación de usar items
+				currentChar.playAnimation('attack');
+			}
+
 		}
-		else {
-			console.log('No hay blanco');
+
+
+		//Ya se realizó la acción
+		else if (currentChar.acted = 1) {
+
+			//Si se usa in item, quitarlo del inventario
+			if(kind == 'item') {
+				inventory[itemToUse][0] --;
+			}
+
+			//Stance animation
+			currentChar.currentAnimation = currentChar.facing;
+			currentChar.frame = 0;
+			currentChar.animationPlaying = true;
+			currentChar.animationLoop = true;
+
+			//Revisar si hubo un blanco en la celda
+			let target = checkTile(currentTile, 'target');
+
+			//Hay un blanco en la celda, determinar resultado del ataque
+			if(target[0] == true) {
+
+				//Si es un ataque
+				if(kind == 'attack') {
+
+					//Si el número es mayor a la defensa del enemigo, conectará (Ajustar la formula después)
+					if(randomNumber(1,20) > characters[target[1]].def) {
+
+						//Modifcar la formula después.
+						let damage = randomNumber(1, 20);
+
+						//Reproducir animación de recibir golpe?
+						console.log('El ataque conectó, calcular daño: ');
+						showDamage('damage', damage, target[1]);
+					}
+
+					//El ataque no conectó
+					else {
+						states.current = states.anouncement;
+
+						//Turno del jugador, mostrar el menú
+						if(playerParty.includes(turno[0])) {
+							states.prev = states.battleMenu;
+						}
+
+						//Sigue siendo turno del enemigo
+						else {
+							states.prev = states.enemyTurn;
+						}
+					
+						showAnouncement('Miss!');
+					}
+				}
+
+				//Si se está usando un item
+				else if(kind == 'item') {
+					showDamage(inventory[itemToUse][1], inventory[itemToUse][2], target[1]);
+				}
+			}
+
+			//No hay blanco válido, se termina la acción
+			else {
+
+				states.current = states.battleMenu;
+				states.prev = states.battleMenu;
+
+				checkState();
+			}
 		}
-
-		currentTile = currentChar.charPos;
-		centerCamera(currentTile[0], currentTile[1], 0);
-		
-		console.log('De cualquier manera, mostrar la animación');
-
-		movementTiles = [];
-
-		currentChar.acted = 1;
-
-		drawGrid();//de mientras para ocultar las celdas de movimiento, debería quitarse con la animacón.
-
-		states.current = states.battleMenu;
-		states.prev = states.battleMenu;
-
-		checkState();
 	}
 
 
@@ -1306,6 +2155,11 @@ window.onload = function() {
 				range = thisChar.attackRange;
 				tile = 1;
 				break;
+
+			case 'item':
+				range = thisChar.itemRange;
+				tile = 8;
+				break;
 		}
 
 		let nPoint = thisChar.charPos[1] - range;
@@ -1325,7 +2179,9 @@ window.onload = function() {
 			if(west != east) {
 				for(let k = west; k <= east; k++) {
 					if(k == currentTile[0] && north == currentTile[1]) {
-						//targetTiles[k][north] = 3;
+						if(kind == 'item') {
+							targetTiles[k][north] = tile;
+						}
 					}
 					else {
 						if(kind == 'move') {
@@ -1394,13 +2250,12 @@ window.onload = function() {
 
 			case states.action:
 			case states.attack:
+			case states.itemUsage:
+				itemToUse = '';
 				hideMenus();
 				hideCards();
 				states.current = states.action;
 				states.prev = states.battleMenu;
-				movementTiles = [];
-				showMenu('battleMenu');
-				showMenu('actionMenu');
 				checkState();
 				break;
 
@@ -1426,6 +2281,7 @@ window.onload = function() {
 	}
 
 
+	//Genera un número aleatorio entre dos valores
 	function randomNumber(min, max) {
 		return Math.floor(Math.random() * (max - min + 1) ) + min;
 	}

@@ -26,7 +26,12 @@
 			7: Show Other's Range
 			8: Enemy Turn
 			9: Facing Selection
-			10: Battle Over<br>
+			10: Resolve Attack
+			11: Anouncement
+			12: List
+			13: Item Usage
+			14: Resolve Item
+			15: Battle Over<br>
 			Current:
 			<span id="currentState"></span><br>
 			Previous:
@@ -118,34 +123,43 @@
 
 		<div class="menu hidden" id="battleMenu">
 			<ul id="battleMenu_options">
-				<li id="move" class="active">Move</li>
-				<li id="act">Action</li>
-				<li id="wait">Wait</li>
+				<li name="move" id="move" class="active">Move</li>
+				<li name="act" id="act">Action</li>
+				<li name="wait" id="wait">Wait</li>
 			</ul>
 		</div>
+
 		<div class="menu hidden" id="actionMenu">
 			<ul id="actionMenu_options">
-				<li id="attack" class="active">Attack</li>
-				<li id="special">Special</li>
+				<li name="attack" id="attack" class="active">Attack</li>
+				<li name="special" id="special">Special</li>
+				<li name="item" id="item">Item</li>
 			</ul>
 		</div>
+
+		<div class="menu hidden" id="listMenu">
+			<ul id="listMenu_options">
+			</ul>
+		</div>
+
 		<div class="menu hidden" id="confirmMenu">
 			<span id="confirmText">Move Here?</span>
 			<ul id="confirmMenu_options">
-				<li id="confirm" class="active">Yes</li>
-				<li id="cancel">No</li>
+				<li name="confirm" id="confirm" class="active">Yes</li>
+				<li name="cancel" id="cancel">No</li>
 			</ul>
+		</div>
+
+		<div class="menu hidden" id="anouncementMenu">
+			<span id="anouncementText">Lorem</span>
+		</div>
+
+		<div id="damageCont">
+			<span id="hundreds" class=""></span>
+			<span id="tens" class=""></span>
+			<span id="units" class=""></span>
 		</div>
 	</div>
 
-	<div style="display:none;">
-		<!--<img src="img/greenTile.png" />
-		<img src="img/redTile.png" />
-		<img src="img/walkableTile.png" />
-		<img src="img/activeTile.png" />-->
-		<!--<img src="img/sprite_01.png" />
-		<img src="img/sprite_02.png" />
-		<img src="img/sprite_03.png" />-->
-	</div>
 </body>
 </html>
