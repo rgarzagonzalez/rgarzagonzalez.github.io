@@ -1,16 +1,13 @@
 /*
 *	TO-DO:
-*		- Comandos especiales para cada personaje
-*		- Charge actions
-*			- Agregar al orden de turno
-*			- Área de efecto
 *		- Diferentes escenarios
 *
 *		- Corregir la función del turno enemigo
 *		- Corregir formula para evasión
 *		- Corregir formula para determinar cantidad de daño
 *		- Corregir stats
-*		- Posición de números de daño
+*		- Corregir comandos
+*		- Área de efecto en los hechizos
 *	
 *		- Celdas de distintas alturas
 *		- Ganar niveles de experiencia
@@ -41,6 +38,239 @@ window.onload = function() {
 		east: 1,
 		west: 3
 	}
+
+	let sprite_01 = new Image();
+	let sprite_02 = new Image();
+	let sprite_03 = new Image();
+	let sprite_04 = new Image();
+	let shadow = new Image();
+	let arrowSprite = new Image();
+	let fxSprite = new Image();
+
+	let charList = [
+		[
+			'Monk', sprite_01, 204, 138, -45, -85, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, [['Zen Kick', 5, 'atk', 2, 2], ['Zen Punch', 5, 'atk', 2, 2]],
+			[
+				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+				[0],
+				[0],
+				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
+				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
+				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
+				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2]
+			]
+		],
+		[
+			'Fighter', sprite_02, 108, 150, 4, -104, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, [['Wild Swing', 5, 'atk', 2, 2], ['Wild Swing', 5, 'atk', 2, 2]],
+			[
+				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0]
+			]
+		],
+		[
+			'Mage', sprite_03, 105, 130, 4, -81, 1, 0, 100, 50, 6, 5, 5, 5, 5, 2, 1, 0, 0, [['Fire', 5, 'mgAtk', 1, 2], ['Bolt', 5, 'mgAtk', 3, 15]],
+			[
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0],
+				[0]
+			]
+		],
+		[
+			'Slime', sprite_04, 102, 140, 6, -84, 1, 0, 1, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, [],
+			[
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
+				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]
+			]
+		]
+	];
+
+
+	let gridList = [
+		[
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
+		]
+	];
+
+	let inventory = {
+		potion: [5, 'hpUp', 30],
+		elixir: [3, 'apUp', 10],
+		hiPotion: [0, 'hpUp', 50]
+	}
+
+	let itemToUse = '';
+	let commandToUse = '';
+
+
+	let canvasCart = document.getElementById('gameCanvasCart');
+	let cCart = canvasCart.getContext('2d');
+
+	let canvasIso = document.getElementById('gameCanvasIso');
+	let cIso = canvasIso.getContext('2d');
+
+	let canvasChars = document.getElementById('gameCanvasIsoChars');
+	let cChars = canvasChars.getContext('2d');
+
+	let tileSprite = new Image();
+	tileSprite.src = 'img/tiles.png';
+	tileSprite.addEventListener('load', assetLoaded);
+
+	sprite_01.src = 'img/sprite_01.png';
+	sprite_01.addEventListener('load', assetLoaded);
+
+	sprite_02.src = 'img/sprite_02.png';
+	sprite_02.addEventListener('load', assetLoaded);
+
+	sprite_03.src = 'img/sprite_03.png';
+	sprite_03.addEventListener('load', assetLoaded);
+
+	sprite_04.src = 'img/sprite_04.png';
+	sprite_04.addEventListener('load', assetLoaded);
+
+	shadow.src = 'img/shadow.png';
+	shadow.addEventListener('load', assetLoaded);
+
+	arrowSprite.src = 'img/arrow.png';
+	arrowSprite.addEventListener('load', assetLoaded);
+
+	fxSprite.src = 'img/fx.png';
+	fxSprite.addEventListener('load', assetLoaded);
+
+	let assets = 0;
+
+	let tileWidth = 112;
+	let tileHeight = 60;
+
+	let portraitSize = 120;
+
+	let gridWidth = 10;
+	let gridHeight = 10;
+
+	let grid = gridList[0];
+
+	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
+	let yOffset = 0;
+
+	//let currentTile = [];
+	let prevPos = [];
+
+	let Keys = {
+		UP: 38,
+		DOWN: 40,
+		LEFT: 37,
+		RIGHT: 39,
+		W: 87,
+		A: 65,
+		S: 83,
+		D: 68,
+		J: 74,
+		K: 75
+	}
+
+	let states = {
+		current: 0,
+		prev: 0,
+		idle: 0,
+		battleMenu: 1,
+		move: 2,
+		action: 3,
+		confirm: 4,
+		attack: 5,
+		explore: 6,
+		showOtherRange: 7,
+		enemyTurn: 8,
+		faceSelection: 9,
+		resolveAttack: 10,
+		announcement: 11,
+		list: 12,
+		itemUsage: 13,
+		resolveItem: 14,
+		commandSelect: 15,
+		resolveSpecial: 16,
+		magicTarget: 17,
+		targetTile: 18,
+		targetUnit: 19,
+		resolveSpell: 20,
+		battleOver: 21
+
+	}
+
+	let movementTiles = [];
+
+	let charPos = [4, 1];
+	let moved = 0;
+	let acted = 0;
+
+	let arrow = {
+		sprite: arrowSprite,
+		currentFrame: 0,
+		currentAnimationFrames: 4,
+		currentAnimationHolds: 3,
+		holds: 0
+	}
+
+	let char1 = new Character(charList[0]);
+
+	let char2 = new Character(charList[1]);
+
+	let char3 = new Character(charList[2]);
+
+	let char4 = new Character(charList[3]);
+
+	let characters = [char1, char2, char3, char4];
+
+	let playerParty = [0, 1, 2];
+
+	let enemyParty = [3];
+
+	let currentChar = '';
+
+	let turnList = [];
+
+	let turno = [];
+
+	let slowActions = [];
+
+	let characterDrawOrder = [];
+
+	let currentTile = [];
+
+	let fxAnimationFrames = [
+		[0,0,0,0,1,1,1,1,2,2,2,2,0,0,0,0,1,1,1,1,2,2,2,2,0,0,0,0,1,1,1,1,2,2,2,2],
+		[0,0,0,0,1,1,1,1,2,2,2,2],
+		[0,0,0,0,1,1,1,1,2,2,2,2]
+	];
+
+	let fxSp = new Sprite(fxSprite, 139, 197, 0, -150, fxAnimationFrames);
+
+	let fx = [];
+
 
 	function Character(args) {
 		this.name = args[0];
@@ -86,6 +316,7 @@ window.onload = function() {
 		this.charPos = [];	//Celda donde se encuentra el personaje
 		this.moved = 0;	//Ya se movio?
 		this.acted = 0;	//Ya actuó?
+		this.casting = 0; //Está invocando un hechizo?
 		this.selectFacing = 0;	//Se está cambiando la dirección?
 		this.tileValues = [];	//Cuales celdas estan al frente, detrás y al costado
 	}
@@ -283,228 +514,67 @@ window.onload = function() {
 		}
 	}
 
-	function Sprite(animationFrames) {
+
+	function Sprite(sprite, width, height, offsetX, offsetY, animationFrames) {
+		this.sprite = sprite;
+
+		this.width = width;
+		this.height = height;
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+
 		this.frame = 0;
-		this.animationFrames;
+		this.animationFrames = animationFrames;
+		this.currentAnimation;
+
+		this.animationPlaying = true;
+		this.animationLoop = true;
+
+		this.charPos = [];
 	}
 
-	let sprite_01 = new Image();
-	let sprite_02 = new Image();
-	let sprite_03 = new Image();
-	let sprite_04 = new Image();
-	let shadow = new Image();
-	let arrowSprite = new Image();
+	Sprite.prototype.animate = function() {
+		if(this.animationPlaying == true) {
+			this.frame ++;
 
+			if(this.frame == this.animationFrames[this.currentAnimation].length) {
+				if(this.animationLoop == true) {
+					this.frame = 0;
+				}
+				else {
+					this.charPos = [];
+					console.log('temrinó la animación del efecto');
 
-	let charList = [
-		[
-			'Monk', sprite_01, 204, 138, -45, -85, 1, 0, 100, 50, 6, 5, 5, 5, 5, 2, 1, 0, 0, ['Zen', 'Zen Punch'],
-			[
-				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
-				[0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
-				[0],
-				[0],
-				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
-				[0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 11, 11, 11],
-				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2],
-				[0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2]
-			]
-		],
-		[
-			'Fighter', sprite_02, 108, 150, 4, -104, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
-			[
-				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
-				[0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8],
-				[0],
-				[0],
-				[0],
-				[0],
-				[0],
-				[0]
-			]
-		],
-		[
-			'Mage', sprite_03, 105, 130, 4, -81, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, ['Fight', 'Wild Swing'],
-			[
-				[0],
-				[0],
-				[0],
-				[0],
-				[0],
-				[0],
-				[0],
-				[0]
-			]
-		],
-		[
-			'Slime', sprite_04, 102, 140, 6, -84, 1, 0, 100, 50, 5, 5, 5, 5, 5, 2, 1, 0, 0, [],
-			[
-				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
-				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
-				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
-				[0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,1,1,1,2,2,2,3,3,3,2,2,2,1,1,1,0,0,0,0,1,1,1,2,2,2,3,3,3,2,2,4,4,5,5,6,6,6,7,7,7,7,8,8,8,9,9,9,10,10,11,11,12,12,12,13,13,13,14,14,14,15,15,15,16,16,16,17,17,17,18,18,18],
-				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
-				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
-				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5],
-				[0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]
-			]
-		]
-	];
+					console.log(states.current + ' <--states current');
+					console.log(states.resolveSpell + ' <-- resolve spell state');
 
-
-	let gridList = [
-		[
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
-		]
-	];
-
-	let inventory = {
-		potion: [5, 'hpUp', 30],
-		elixir: [3, 'apUp', 10],
-		hiPotion: [0, 'hpUp', 50]
+					if(states.current == states.resolveSpell) {
+						resolveSpell();
+					}
+				}
+			}
+		}
 	}
 
-	let itemToUse = '';
+
+	function drawFx(spellToUse, targetCoords) {
+		console.log('Dibujar efecto');
+		console.log(spellToUse + '<- spell to use');
+		console.log(targetCoords + '<- coordenadas');
 
 
-	let canvasCart = document.getElementById('gameCanvasCart');
-	let cCart = canvasCart.getContext('2d');
+		switch(spellToUse) {
+			case 'Bolt':
+			case 'Fire':
+				fxSp.currentAnimation = 0;
+				break;
+		}
 
-	let canvasIso = document.getElementById('gameCanvasIso');
-	let cIso = canvasIso.getContext('2d');
-
-	let canvasChars = document.getElementById('gameCanvasIsoChars');
-	let cChars = canvasChars.getContext('2d');
-
-	let tileSprite = new Image();
-	tileSprite.src = 'img/tiles.png';
-	tileSprite.addEventListener('load', assetLoaded);
-
-	sprite_01.src = 'img/sprite_01.png';
-	sprite_01.addEventListener('load', assetLoaded);
-
-	sprite_02.src = 'img/sprite_02.png';
-	sprite_02.addEventListener('load', assetLoaded);
-
-	sprite_03.src = 'img/sprite_03.png';
-	sprite_03.addEventListener('load', assetLoaded);
-
-	sprite_04.src = 'img/sprite_04.png';
-	sprite_04.addEventListener('load', assetLoaded);
-
-	shadow.src = 'img/shadow.png';
-	shadow.addEventListener('load', assetLoaded);
-
-	arrowSprite.src = 'img/arrow.png';
-	arrowSprite.addEventListener('load', assetLoaded);
-
-	let assets = 0;
-
-	let tileWidth = 112;
-	let tileHeight = 60;
-
-	let portraitSize = 120;
-
-	let gridWidth = 10;
-	let gridHeight = 10;
-
-	let grid = gridList[0];
-
-	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
-	let yOffset = 0;
-
-	//let currentTile = [];
-	let prevPos = [];
-
-	let Keys = {
-		UP: 38,
-		DOWN: 40,
-		LEFT: 37,
-		RIGHT: 39,
-		W: 87,
-		A: 65,
-		S: 83,
-		D: 68,
-		J: 74,
-		K: 75
+		fxSp.charPos = [targetCoords[0], targetCoords[1]];
+		fxSp.animationLoop = false;
+		fxSp.frame = 0;
+		drawGrid();
 	}
-
-	let states = {
-		current: 0,
-		prev: 0,
-		idle: 0,
-		battleMenu: 1,
-		move: 2,
-		action: 3,
-		confirm: 4,
-		attack: 5,
-		explore: 6,
-		showOtherRange: 7,
-		enemyTurn: 8,
-		faceSelection: 9,
-		resolveAttack: 10,
-		anouncement: 11,
-		list: 12,
-		itemUsage: 13,
-		resolveItem: 14,
-		battleOver: 15
-
-	}
-
-	let movementTiles = [];
-
-	let charPos = [4, 1];
-	let moved = 0;
-	let acted = 0;
-
-	let arrow = {
-		sprite: arrowSprite,
-		currentFrame: 0,
-		currentAnimationFrames: 4,
-		currentAnimationHolds: 3,
-		holds: 0
-	}
-
-	let char1 = new Character(charList[0]);
-	char1.charPos = [4,6];
-	char1.calculateTileValues(gridWidth, gridHeight);
-
-	let char2 = new Character(charList[1]);
-	char2.charPos = [3,5];
-	char2.calculateTileValues(gridWidth, gridHeight);
-
-	let char3 = new Character(charList[2]);
-	char3.charPos = [3,7];
-	char3.calculateTileValues(gridWidth, gridHeight);
-
-	let char4 = new Character(charList[3]);
-	char4.charPos = [6,6];
-	char4.calculateTileValues(gridWidth, gridHeight);
-
-	let characters = [char1, char2, char3, char4];
-
-	let playerParty = [0, 1, 2];
-
-	let enemyParty = [3];
-
-	let currentChar = '';
-
-	let turnList = [];
-
-	let turno = [];
-
-	let characterDrawOrder = [];
-
-	let currentTile = [];
 
 
 
@@ -512,7 +582,7 @@ window.onload = function() {
 	function assetLoaded() {
 		assets++;
 		
-		if(assets == 7) {
+		if(assets == 8) {
 
 			debug();
 
@@ -523,13 +593,14 @@ window.onload = function() {
 			drawGrid();
 			animate();
 
+			battleOrder();
+
 			checkState();
 		}
 	}
 
 
 	function checkState() {
-		console.log('checking state: ' + states.current);
 		if(checkParties()) {
 			switch(states.current) {
 				case states.idle:
@@ -541,6 +612,7 @@ window.onload = function() {
 					currentChar.selectFacing = 0;
 					currentChar.calculateTileValues(gridWidth, gridHeight);
 					currentTile = currentChar.charPos;
+					movementTiles = [];
 					centerCamera(currentTile[0], currentTile[1], 1);
 					showCard('current', turno[0]);
 					menuHandler(states.current);
@@ -579,13 +651,31 @@ window.onload = function() {
 				case states.resolveItem:
 					resolveAction('item');
 					break;
+
+				case states.resolveSpecial:
+					resolveAction('command');
+					break;
 			}
 		}
+
 		else {
-			console.log('Game Over');
 			hideMenus();
-			states.current = states.battleOver;
+
+			if(states.current == states.battleOver) {
+				stageSelect();
+			}
+			else {
+				states.current = states.announcement;
+				states.prev = states.battleOver;
+				showAnnouncement('Battle Over');
+			}
 		}
+	}
+
+
+	function stageSelect() {
+		console.log('Mostrando stages');
+		showMenu('stageMenu');
 	}
 
 
@@ -633,27 +723,29 @@ window.onload = function() {
 				let coords = [moveKeysX[i], moveKeysY[j]];
 				let rangeDistanceSum = 0;
 
+				//Si las coordinadas estan dentro del tablero
+				if(coords[0] > 0 && coords[0] < gridWidth && coords[1] > 0 && coords[1] < gridHeight) {
+					for(let k = 0; k < playerParty.length; k++) {
 
-				for(let k = 0; k < playerParty.length; k++) {
+						//Suma de la distancia combinada a todos los blancos
+						rangeDistanceSum += calculateDistance(coords, characters[playerParty[k]].charPos);
 
-					//Suma de la distancia combinada a todos los blancos
-					rangeDistanceSum += calculateDistance(coords, characters[playerParty[k]].charPos);
+						//Distancia solo al personaje más cercano
+						if(k == closest) {
+							let rangeDistance = calculateDistance(coords, characters[playerParty[closest]].charPos);
 
-					//Distancia solo al personaje más cercano
-					if(k == closest) {
-						let rangeDistance = calculateDistance(coords, characters[playerParty[closest]].charPos);
+							//Más prioridad a las que se encuentren detrás o al lado del blanco
+							if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'side') {
+								rangeDistance -= 0.1;
+							}
+							else if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'back') {
+								rangeDistance -= 0.2;
+							}
 
-						//Más prioridad a las que se encuentren detrás o al lado del blanco
-						if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'side') {
-							rangeDistance -= 0.1;
+							rangeDistances.push(rangeDistance);
+							rangeDistancesIndexes.push(coords);
+
 						}
-						else if(characters[playerParty[closest]].tileValues[moveKeysY[j]][moveKeysX[i]] == 'back') {
-							rangeDistance -= 0.2;
-						}
-
-						rangeDistances.push(rangeDistance);
-						rangeDistancesIndexes.push(coords);
-
 					}
 				}
 
@@ -923,6 +1015,16 @@ window.onload = function() {
 			}
 		}
 
+		if(slowActions.length > 0) {
+			for(let i = 0; i < slowActions.length; i++) {
+				slowActions[i][4] -- ;
+
+				if(slowActions[i][4] == 0) {
+					turno.push(['spell', i]);
+				}
+			}
+		}
+
 		checkTurn();
 	}
 
@@ -931,8 +1033,13 @@ window.onload = function() {
 	function checkTurn() {
 		//console.log('check turn');
 		if(turno.length > 0) {
-			//console.log('Longitud = '+ turno.length +', activar turno');
-			turn();
+			if(turno[0][0]) {
+				resolveSpell();
+			}
+			else {
+				//console.log('Longitud = '+ turno.length +', activar turno');
+				turn();
+			}
 		}
 
 		else {
@@ -944,7 +1051,8 @@ window.onload = function() {
 
 
 	function turn(){
-		console.log('inicia el turno');
+
+		battleOrder();
 
 		currentChar = characters[turno[0]];
 		currentTile = currentChar.charPos;
@@ -1065,7 +1173,6 @@ window.onload = function() {
 
 
 	function drawGrid() {
-		console.log('draw');
 		cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
 		cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
 
@@ -1081,7 +1188,13 @@ window.onload = function() {
 
 				for(let k = 0; k < characters.length; k++) {
 					if(characters[k].charPos[1] == i && characters[k].charPos[0] == j) {
-						characterDrawOrder.push(k);
+						characterDrawOrder.push(['char', k]);
+					}
+				}
+
+				if(fxSp.charPos.length > 0) {
+					if(fxSp.charPos[1] == i && fxSp.charPos[0] == j) {
+						characterDrawOrder.push(['fx', null]);
 					}
 				}
 
@@ -1100,40 +1213,71 @@ window.onload = function() {
 		cChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
 
 		for(let i = 0; i < characterDrawOrder.length; i++) {
-			let char = characterDrawOrder[i];
-			let x = characters[char].charPos[0];
-			let y = characters[char].charPos[1];
-			let width = characters[char].width;
-			let height = characters[char].height;
-			let offsetX = characters[char].offsetX;
-			let offsetY = characters[char].offsetY;
-			
-			let frame = characters[char].frame;
-			let currentAnimation = characters[char].currentAnimation;
-			let animationFrames = characters[char].animationFrames;
+			let char;
+			let x;
+			let y;
+			let width;
+			let height;
+			let offsetX;
+			let offsetY;
+			let frame;
+			let currentAnimation;
+			let animationFrames;
+			let currentFrame;
+			let cordsIso;
+			let sprite;
 
-			let currentFrame = animationFrames[currentAnimation][frame];
+			if(characterDrawOrder[i][0] == 'char') {
+				char = characterDrawOrder[i][1];
+				x = characters[char].charPos[0];
+				y = characters[char].charPos[1];
+				width = characters[char].width;
+				height = characters[char].height;
+				offsetX = characters[char].offsetX;
+				offsetY = characters[char].offsetY;
 
-			let cordsIso = cartToIso(x, y);
-			let sprite = characters[char].sprite;
+				frame = characters[char].frame;
+				currentAnimation = characters[char].currentAnimation;
+				animationFrames = characters[char].animationFrames;
 
-			//colocar marca en retícula cartesiana
-			cCart.beginPath();
-			cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
-			cCart.fillStyle = 'yellow';
-			cCart.fill();
+				currentFrame = animationFrames[currentAnimation][frame];
 
-			//dibujar personajes en retícula isométrica
-			cChars.drawImage(shadow, 0, 0, 56, 20, cordsIso[0] + 28, cordsIso[1] + 24, 56, 20);
-			cChars.drawImage(sprite, currentFrame * width, (currentAnimation * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+				cordsIso = cartToIso(x, y);
+				sprite = characters[char].sprite;
 
-			if(characters[char] == currentChar) {
-				if(characters[char].selectFacing == 1) {
-					cChars.drawImage(tileSprite, characters[char].facing * tileWidth, tileHeight * 2, tileWidth, tileHeight, cordsIso[0] + 0, cordsIso[1] - 100, tileWidth, tileHeight);
+				//colocar marca en retícula cartesiana
+				cCart.beginPath();
+				cCart.arc((x * tileHeight) + (tileHeight / 2), (y * tileHeight) + (tileHeight / 2) , 10, 0, 2 * Math.PI, false);
+				cCart.fillStyle = 'yellow';
+				cCart.fill();
+
+				//dibujar personajes en retícula isométrica
+				cChars.drawImage(shadow, 0, 0, 56, 20, cordsIso[0] + 28, cordsIso[1] + 24, 56, 20);
+				cChars.drawImage(sprite, currentFrame * width, (currentAnimation * height) + portraitSize, width, height, cordsIso[0] + offsetX, cordsIso[1] + offsetY, width, height);
+
+				if(characters[char] == currentChar) {
+					if(characters[char].selectFacing == 1) {
+						cChars.drawImage(tileSprite, characters[char].facing * tileWidth, tileHeight * 2, tileWidth, tileHeight, cordsIso[0] + 0, cordsIso[1] - 100, tileWidth, tileHeight);
+					}
+					else {
+						cChars.drawImage(arrowSprite, arrow.currentFrame * 32, 0, 32, 16, cordsIso[0] + 40, cordsIso[1] - 110, 32, 16);
+					}
 				}
-				else {
-					cChars.drawImage(arrowSprite, arrow.currentFrame * 32, 0, 32, 16, cordsIso[0] + 40, cordsIso[1] - 110, 32, 16);
-				}
+			}
+
+			else if(characterDrawOrder[i][0] == 'fx') {
+				x = fxSp.charPos[0];
+				y = fxSp.charPos[1];
+
+				frame = fxSp.frame;
+				currentAnimation = fxSp.currentAnimation;
+				animationFrames = fxSp.animationFrames;
+
+				currentFrame = animationFrames[currentAnimation][frame];
+
+				cordsIso = cartToIso(x, y);
+
+				cChars.drawImage(fxSprite, currentFrame * fxSp.width, fxSp.currentAnimation * fxSp.height, fxSp.width, fxSp.height, cordsIso[0] + fxSp.offsetX, cordsIso[1] + fxSp.offsetY, fxSp.width, fxSp.height);
 			}
 		}
 	}
@@ -1158,6 +1302,10 @@ window.onload = function() {
 			arrow.currentFrame = 0;
 		}
 
+		if(fxSp.charPos.length > 0) {
+			fxSp.animate();
+		}
+
 
 		setTimeout(animate, 1000/30);
 	}
@@ -1167,7 +1315,17 @@ window.onload = function() {
 	function battleOrder() {
 		turnList = [];
 		let list = '';
-		let i = 0;
+		//let i = 0;
+
+		for(let i = 0; i < characters.length; i++) {
+			characters[i].cct = characters[i].ct;
+		}
+
+		if(slowActions.length > 0) {
+			for(let i = 0; i < slowActions.length; i++) {
+				slowActions[i][5] = slowActions[i][4];
+			}
+		}
 
 		while(turnList.length < 20) {
 			for(let i = 0; i < characters.length; i++) {
@@ -1180,7 +1338,16 @@ window.onload = function() {
 					characters[i].cct = 0;
 				}
 			}
-			i++;
+
+			if(slowActions.length > 0) {
+				for(let i = 0; i < slowActions.length; i++) {
+					slowActions[i][5] --;
+
+					if(slowActions[i][5] == 0) {
+						turnList.push('Spell');
+					}
+				}
+			}
 		}
 
 		for(let i = 0; i < turnList.length; i++) {
@@ -1188,7 +1355,6 @@ window.onload = function() {
 		}
 
 		document.getElementById('turnList').innerHTML = list;
-
 	}
 
 
@@ -1378,6 +1544,7 @@ window.onload = function() {
 			case states.move:
 			case states.attack:
 			case states.itemUsage:
+			case states.commandSelect:
 				moveTile(direction);
 				break;
 
@@ -1400,6 +1567,13 @@ window.onload = function() {
 			case states.list:
 				moveMenu('listMenu', direction);
 				break;
+
+			case states.magicTarget:
+				moveMenu('magicTarget', direction);
+				break;
+
+			case states.battleOver:
+				moveMenu('stageMenu', direction);
 		}
 	}
 
@@ -1536,7 +1710,6 @@ window.onload = function() {
 					states.prev = states.move;
 					confirmAction('Move');
 				}
-
 				break;
 
 			case states.action:
@@ -1556,6 +1729,42 @@ window.onload = function() {
 				if(targetItem[0] == true) {
 					states.prev = states.itemUsage;
 					confirmAction('Item');
+				}
+				break;
+
+			case states.commandSelect:
+				let targetCommand = checkTile(currentTile, 'move');
+				if(targetCommand[0] == true) {
+					
+					console.log(commandToUse + '<- usar este comando');
+					
+					let selectedCommand;
+
+					for(let i = 0; i < currentChar.command.length; i++) {
+						if(currentChar.command[i][0] == commandToUse) {
+							selectedCommand = currentChar.command[i];
+						}
+					}
+
+					if(selectedCommand[2] == 'mgAtk') {
+						console.log('aaaaaa');
+						let mgkTarget = checkTile(currentTile, 'target');
+						console.log(mgkTarget);
+
+						if(mgkTarget[0] == true) {
+							document.getElementById('targetUnit').classList.remove('off');
+						}
+						else {
+							document.getElementById('targetUnit').classList.add('off');
+						}
+
+						showMenu('magicTarget');
+						states.current = states.magicTarget;
+					}
+					else {
+						states.prev = states.commandSelect;
+						confirmAction('Command');
+					}
 				}
 				break;
 
@@ -1587,13 +1796,17 @@ window.onload = function() {
 				confirmAction('Wait');
 				break;
 
-			case states.anouncement:
+			case states.announcement:
 				states.current = states.prev;
 				checkState();
 				break;
 
 			case states.list:
 				menuSelect('listMenu');
+				break;
+
+			case states.magicTarget:
+				menuSelect('magicTarget');
 				break;
 		}
 	}
@@ -1635,7 +1848,7 @@ window.onload = function() {
 				break;
 
 			case 'special':
-				console.log('special');
+				showList('special');
 				break;
 
 			case 'item':
@@ -1648,6 +1861,14 @@ window.onload = function() {
 				states.prev = states.action;
 				hideMenus();
 				showRange('item', 'current');
+				break;
+
+			case 'commandItem':
+				commandToUse = menuId;
+				states.current = states.commandSelect;
+				states.prev = states.action;
+				hideMenus();
+				showRange('command', 'current');
 				break;
 
 			case 'wait':
@@ -1668,6 +1889,9 @@ window.onload = function() {
 
 					case states.attack:
 					case states.itemUsage:
+					case states.commandSelect:
+					case states.targetUnit:
+					case states.targetTile:
 						states.current = states.action;
 						itemToUse = '';
 						hideMenus();
@@ -1703,8 +1927,26 @@ window.onload = function() {
 						checkState();
 						break;
 
+					case states.targetTile:
+						castSpell(commandToUse, 'tile');
+						currentChar.casting = 1;
+						break;
+
+					case states.targetUnit:
+						castSpell(commandToUse, 'target');
+						currentChar.casting = 1;
+						break;
+
+					case states.commandSelect:
+						states.current = states.resolveSpecial;
+						states.prev = states.resolveSpecial;
+						checkState();
+
+						break;
+
 					case states.faceSelection:
 						//Fin del turno
+						currentChar.calculateTileValues(gridWidth, gridHeight);
 						currentChar.moved = 0;
 						currentChar.acted = 0;
 						currentChar.ct = 0;
@@ -1713,21 +1955,64 @@ window.onload = function() {
 						document.getElementById('act').classList.remove('off');
 						hideMenus();
 						turno.shift();
+						battleOrder();
 						checkTurn();
 						break;
 				}
+				break;
+
+			case 'targetTile':
+				console.log('Target the Tile');
+				states.prev = states.targetTile;
+				confirmAction('Command');
+				break;
+
+			case 'targetUnit':
+				console.log('Target the unit');
+				states.prev = states.targetUnit;
+				confirmAction('Command');
 				break;
 		}
 	}
 
 
+	//Inicia invocación
+	function castSpell(spell, targeting) {
+		let whichSpell;
+		let whichTarget;
+
+		for(let i = 0; i < currentChar.command.length; i++) {
+			if(currentChar.command[i][0] == spell){
+				whichSpell = currentChar.command[i];
+			}
+		}
+
+		if(targeting == 'tile') {
+			whichTarget = currentTile;
+		}
+		else if(targeting == 'target') {
+			whichTarget = checkTile(currentTile, 'target');
+		}
+
+		//Caster, Spell, Tile/Unit, Coords/Target, Ticks, Ticks for Calculation, AP
+		let spellTurn = [turno[0], spell, targeting, whichTarget, whichSpell[4], whichSpell[4], whichSpell[1]];
+
+		slowActions.push(spellTurn);
+		currentChar.acted = 1;
+		battleOrder();
+		states.current = states.battleMenu;
+		states.prev = states.battleMenu;
+		checkState();
+	}
+
+
 	//
 	function showList(kind) {
+		let listTxt = '';
 		switch(kind) {
 			case 'items':
 				console.log('Lista de items');
 				let itemKeys = Object.keys(inventory);
-				let listTxt = '';
 				console.log(inventory);
 
 				for(let i = 0; i < itemKeys.length; i++) {
@@ -1742,17 +2027,31 @@ window.onload = function() {
 					}
 				}
 
-				var list = document.getElementById('listMenu_options');
+				break;
 
-				list.innerHTML = listTxt;
+			case 'special':
 
-				states.current = states.list;
-				states.prev = states.action;
+				for(let i = 0; i < currentChar.command.length; i++) {
+					listTxt += '<li name="commandItem" id="' + currentChar.command[i][0] + '"';
 
-				showMenu('listMenu');
+					if(i == 0) {
+						listTxt += ' class="active" ';
+					}
+
+					listTxt += '>' + currentChar.command[i][0] + ': ' + currentChar.command[i][1] + ' AP</li>';
+				}
 
 				break;
 		}
+
+		var list = document.getElementById('listMenu_options');
+
+		list.innerHTML = listTxt;
+
+		states.current = states.list;
+		states.prev = states.action;
+
+		showMenu('listMenu');
 	}
 
 
@@ -1768,6 +2067,7 @@ window.onload = function() {
 
 			case 'Attack':
 			case 'Item':
+			case 'Command':
 				confirmText = 'Perform this action';
 
 				//Revisar si hay un blanco en la baldosa seleccionada
@@ -1820,9 +2120,9 @@ window.onload = function() {
 
 
 	//Muestra mensajes
-	function showAnouncement(str) {
-		document.getElementById('anouncementText').innerHTML = str;
-		showMenu('anouncementMenu');
+	function showAnnouncement(str) {
+		document.getElementById('announcementText').innerHTML = str;
+		showMenu('announcementMenu');
 	}
 
 
@@ -1842,10 +2142,6 @@ window.onload = function() {
 				document.getElementById('damageCont').style.color = 'green';
 				break;
 		}
-
-		console.log(characters[target].charPos);
-		let caca = cartToIso(characters[target].charPos[0], characters[target].charPos[0]);
-		console.log(caca);
 
 		let txt = damage.toString();
 
@@ -1924,17 +2220,91 @@ window.onload = function() {
 
 			//Ganar xp?
 
-			if(playerParty.includes(turno[0])) {	//Turno del jugador, mostrar el menú
-				states.current = states.battleMenu;
-				states.prev = states.battleMenu;
+			console.log(turno[0] + '<-- este es el turno');
+
+			if(Array.isArray(turno[0])) {
+				console.log('quitar ataque del array de turnos');
+				turno.shift();
+				states.current = states.idle;
+				states.prev = states.idle;
 			}
-			else {	//Sigue siendo turno del enemigo
-				states.prev = states.enemyTurn;
-				states.current = states.enemyTurn;
+
+			else {
+				if(playerParty.includes(turno[0])) {	//Turno del jugador, mostrar el menú
+					states.current = states.battleMenu;
+					states.prev = states.battleMenu;
+				}
+				else {	//Sigue siendo turno del enemigo
+					states.prev = states.enemyTurn;
+					states.current = states.enemyTurn;
+				}
 			}
 
 			checkState();
 		}, 1500);
+	}
+
+
+	function resolveSpell() {
+		states.current = states.resolveSpell;
+		states.prev = states.resolveSpell;
+		console.log('Se usa el hechizo');
+
+		let spellToUse = slowActions[turno[0][1]];
+		let caster = characters[spellToUse[0]];
+		let requiredAp = spellToUse[6];
+		let targetingWhat = spellToUse[2];
+		let targetCoords;
+
+		if(targetingWhat == 'target') {
+			targetCoords = characters[spellToUse[3][1]].charPos;
+		}
+		else if(targetingWhat == 'tile') {
+			targetCoords = spellToUse[3];
+		}
+
+		console.log(caster.casting);
+
+		if(caster.casting == 1) {
+			console.log('desmadre de animación');
+			currentTile = caster.charPos;
+			centerCamera(currentTile[0], currentTile[1], 1);
+
+			if(caster.ap > requiredAp) {
+				console.log('Suficiente Ap');
+				caster.ap -= requiredAp;
+
+				setTimeout(function(){
+					centerCamera(targetCoords[0], targetCoords[1], 1);
+					setTimeout(function() {
+						drawFx(spellToUse[1], targetCoords);
+						caster.casting = 0;
+					}, 100);
+				}, 500);
+			}
+			else {
+				console.log('Not enough Ap');
+			}
+		}
+
+		else {
+			console.log('Calcular daño');
+			console.log(targetCoords);
+
+			let target = checkTile(targetCoords, 'target');
+			console.log(target);
+
+			if(target[0] == true) {
+				if(randomNumber(1,20) > characters[target[1]].mDef){
+					let damage = randomNumber(1, 20);
+					console.log(turno[0]);
+					showDamage('damage', damage, target[1]);
+				}
+				else {
+					console.log('Can you even miss?');
+				}
+			}
+		}
 	}
 
 
@@ -2009,12 +2379,20 @@ window.onload = function() {
 				}
 			}
 
-			if(kind == 'attack') {
-				currentChar.playAnimation('attack');
-			}
-			else if (kind == 'item') {
-				//Actualizar cuando haya animación de usar items
-				currentChar.playAnimation('attack');
+			switch(kind) {
+				case 'attack':
+					currentChar.playAnimation('attack');
+					break;
+
+				case 'item':
+					//Actualizar cuando haya animación de usar items
+					currentChar.playAnimation('attack');
+					break;
+
+				case 'command':
+					//Actualizar cuando haya animación de ataque especial
+					currentChar.playAnimation('attack');
+					break;
 			}
 
 		}
@@ -2040,41 +2418,95 @@ window.onload = function() {
 			//Hay un blanco en la celda, determinar resultado del ataque
 			if(target[0] == true) {
 
-				//Si es un ataque
-				if(kind == 'attack') {
+				switch(kind) {
 
-					//Si el número es mayor a la defensa del enemigo, conectará (Ajustar la formula después)
-					if(randomNumber(1,20) > characters[target[1]].def) {
+					//Si es un ataque
+					case 'attack':
 
-						//Modifcar la formula después.
-						let damage = randomNumber(1, 20);
+						//Si el número es mayor a la defensa del enemigo, conectará (Ajustar la formula después)
+						if(randomNumber(1,20) > characters[target[1]].def) {
 
-						//Reproducir animación de recibir golpe?
-						console.log('El ataque conectó, calcular daño: ');
-						showDamage('damage', damage, target[1]);
-					}
+							//Modifcar la formula después.
+							let damage = randomNumber(1, 20);
 
-					//El ataque no conectó
-					else {
-						states.current = states.anouncement;
-
-						//Turno del jugador, mostrar el menú
-						if(playerParty.includes(turno[0])) {
-							states.prev = states.battleMenu;
+							//Reproducir animación de recibir golpe?
+							console.log('El ataque conectó, calcular daño: ');
+							showDamage('damage', damage, target[1]);
 						}
 
-						//Sigue siendo turno del enemigo
+						//El ataque no conectó
 						else {
-							states.prev = states.enemyTurn;
-						}
-					
-						showAnouncement('Miss!');
-					}
-				}
+							states.current = states.announcement;
 
-				//Si se está usando un item
-				else if(kind == 'item') {
-					showDamage(inventory[itemToUse][1], inventory[itemToUse][2], target[1]);
+							//Turno del jugador, mostrar el menú
+							if(playerParty.includes(turno[0])) {
+								states.prev = states.battleMenu;
+							}
+
+							//Sigue siendo turno del enemigo
+							else {
+								states.prev = states.enemyTurn;
+							}
+					
+							showAnnouncement('Miss!');
+						}
+						break;
+
+					case 'item':
+						//Si se está usando un item
+						showDamage(inventory[itemToUse][1], inventory[itemToUse][2], target[1]);
+						break;
+
+					case 'command':
+						console.log('Ejecutando commando');
+						console.log(commandToUse);
+						console.log(currentChar.command);
+						let thisCommand;
+
+						for(let i = 0; i < currentChar.command.length; i++) {
+							if(currentChar.command[i][0] == commandToUse) {
+								thisCommand = currentChar.command[i];
+							}
+						}
+
+						console.log(thisCommand[2]);
+
+						switch(thisCommand[2]) {
+							case 'atk':
+								//Si el número es mayor a la defensa del enemigo, conectará (Ajustar la formula después)
+								if(randomNumber(1,20) > characters[target[1]].def) {
+
+									//Modifcar la formula después.
+									let damage = (randomNumber(1, 20)) * thisCommand[4];
+
+									//Reproducir animación de recibir golpe?
+									console.log('El ataque conectó, calcular daño: ');
+									showDamage('damage', damage, target[1]);
+								}
+
+								//El ataque no conectó
+								else {
+									states.current = states.announcement;
+
+									//Turno del jugador, mostrar el menú
+									if(playerParty.includes(turno[0])) {
+										states.prev = states.battleMenu;
+									}
+
+									//Sigue siendo turno del enemigo
+									else {
+										states.prev = states.enemyTurn;
+									}
+					
+									showAnnouncement('Miss!');
+								}
+								break;
+
+							case 'mgAtk':
+								console.log('magia');
+								break;
+						}
+						break;
 				}
 			}
 
@@ -2159,6 +2591,15 @@ window.onload = function() {
 			case 'item':
 				range = thisChar.itemRange;
 				tile = 8;
+				break;
+
+			case 'command':
+				for(let i = 0; i < thisChar.command.length; i++) {
+					if(thisChar.command[i][0] == commandToUse) {
+						range = thisChar.command[i][3];
+					}
+				}
+				tile = 1;
 				break;
 		}
 
@@ -2251,7 +2692,11 @@ window.onload = function() {
 			case states.action:
 			case states.attack:
 			case states.itemUsage:
+			case states.commandSelect:
+			case states.targetTile:
+			case states.targetUnit:
 				itemToUse = '';
+				commandToUse = ''
 				hideMenus();
 				hideCards();
 				states.current = states.action;
@@ -2274,10 +2719,6 @@ window.onload = function() {
 				checkState();
 				break;
 		}
-
-		//checkState();
-
-		//drawGrid();
 	}
 
 
@@ -2296,27 +2737,42 @@ window.onload = function() {
 		document.getElementById('char1Ct').innerHTML = char1.ct;
 		document.getElementById('char1Acted').innerHTML = char1.acted;
 		document.getElementById('char1Moved').innerHTML = char1.moved;
-		document.getElementById('char1Animation').innerHTML = char1.currentAnimation;
+		document.getElementById('char1Tiles').innerHTML = char1.tileValues.length;
 
 		document.getElementById('char2Name').innerHTML = char2.name;
 		document.getElementById('char2Hp').innerHTML = char2.hp;
 		document.getElementById('char2Ct').innerHTML = char2.ct;
 		document.getElementById('char2Acted').innerHTML = char2.acted;
 		document.getElementById('char2Moved').innerHTML = char2.moved;
+		document.getElementById('char2Tiles').innerHTML = char2.tileValues.length;
 
 		document.getElementById('char3Name').innerHTML = char3.name;
 		document.getElementById('char3Hp').innerHTML = char3.hp;
 		document.getElementById('char3Ct').innerHTML = char3.ct;
 		document.getElementById('char3Acted').innerHTML = char3.acted;
 		document.getElementById('char3Moved').innerHTML = char3.moved;
+		document.getElementById('char3Tiles').innerHTML = char3.tileValues.length;
 
-		if(currentChar == '') {
-			document.getElementById('whoseCurrent').innerHTML = 'None';
-		}
-		else {
-			document.getElementById('whoseCurrent').innerHTML = currentChar.name;
+		document.getElementById('char4Name').innerHTML = char4.name;
+		document.getElementById('char4Hp').innerHTML = char4.hp;
+		document.getElementById('char4Ct').innerHTML = char4.ct;
+		document.getElementById('char4Acted').innerHTML = char4.acted;
+		document.getElementById('char4Moved').innerHTML = char4.moved;
+		document.getElementById('char4Tiles').innerHTML = char4.tileValues.length;
+
+		if(slowActions.length > 0) {
+			document.getElementById('chargeActions').innerHTML = slowActions;
 		}
 
 		setTimeout(debug, 1000/60);
 	}
+
+	char1.charPos = [3,6];
+	char1.calculateTileValues(gridWidth, gridHeight);
+	char2.charPos = [4,5];
+	char2.calculateTileValues(gridWidth, gridHeight);
+	char3.charPos = [4,7];
+	char3.calculateTileValues(gridWidth, gridHeight);
+	char4.charPos = [2,6];
+	char4.calculateTileValues(gridWidth, gridHeight);
 }
