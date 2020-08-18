@@ -102,22 +102,6 @@ window.onload = function() {
 		]
 	];
 
-
-	let gridList = [
-		[
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
-			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
-			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
-		]
-	];
-
 	let inventory = {
 		potion: [5, 'hpUp', 30],
 		elixir: [3, 'apUp', 10],
@@ -169,11 +153,6 @@ window.onload = function() {
 
 	let portraitSize = 120;
 
-	let gridWidth = 10;
-	let gridHeight = 10;
-
-	let grid = gridList[0];
-
 	let xOffset = (canvasIso.width / 2) - (tileWidth / 2);
 	let yOffset = 0;
 
@@ -223,10 +202,6 @@ window.onload = function() {
 
 	let movementTiles = [];
 
-	let charPos = [4, 1];
-	let moved = 0;
-	let acted = 0;
-
 	let arrow = {
 		sprite: arrowSprite,
 		currentFrame: 0,
@@ -234,20 +209,6 @@ window.onload = function() {
 		currentAnimationHolds: 3,
 		holds: 0
 	}
-
-	let char1 = new Character(charList[0]);
-
-	let char2 = new Character(charList[1]);
-
-	let char3 = new Character(charList[2]);
-
-	let char4 = new Character(charList[3]);
-
-	let characters = [char1, char2, char3, char4];
-
-	let playerParty = [0, 1, 2];
-
-	let enemyParty = [3];
 
 	let currentChar = '';
 
@@ -270,6 +231,91 @@ window.onload = function() {
 	let fxSp = new Sprite(fxSprite, 139, 197, 0, -150, fxAnimationFrames);
 
 	let fx = [];
+
+	let animating;
+
+
+
+
+
+
+
+	let gameStart = false;
+
+	let unlockedStages = 2;
+
+	let gridList = [
+		[
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7],
+			[0, 5, 6, 7, 0, 5, 6, 7, 0, 5],
+			[6, 7, 0, 5, 6, 7, 0, 5, 6, 7]
+		],
+		[
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		]
+	];
+
+	let monsters = [
+		[
+			[3, [2,5], 3],
+			[3, [2,6], 3],
+		],
+		[
+			[3, [0,0], 1],
+			[3, [1,0], 1]
+		]
+	];
+
+	let characterPositions = [
+		[
+			[1,[0,4]],
+			[1,[0,5]],
+			[1,[0,6]]
+		],
+		[
+			[0,[4,0]],
+			[0,[5,0]],
+			[0,[6,0]]
+		]
+	];
+
+	let gridWidth = 10;
+	let gridHeight = 10;
+
+	let grid;
+
+	let char1 = new Character(charList[0]);
+
+	let char2 = new Character(charList[1]);
+
+	let char3 = new Character(charList[2]);
+
+	//let monster = new Character(charList[3]);
+
+	//let characters = [char1, char2, char3, monster];
+
+	let characters = [];
+
+	let playerParty = [0, 1, 2];
+
+	//let enemyParty = [3];
+	let enemyParty = [];
 
 
 	function Character(args) {
@@ -577,7 +623,6 @@ window.onload = function() {
 	}
 
 
-
 	//Revisa que los elementos hayan cargado para iniciar el juego
 	function assetLoaded() {
 		assets++;
@@ -589,11 +634,6 @@ window.onload = function() {
 			window.addEventListener('keydown', function(e) {
 				keyDownHandler(e);
 			}, false);
-
-			drawGrid();
-			animate();
-
-			battleOrder();
 
 			checkState();
 		}
@@ -662,12 +702,29 @@ window.onload = function() {
 			hideMenus();
 
 			if(states.current == states.battleOver) {
+				characters = [];
+				enemyParty = [];
+				turno = [];
+				document.getElementById('move').classList.remove('off');
+				document.getElementById('act').classList.remove('off');
+				clearInterval(animating);
+				cCart.clearRect(0, 0, canvasCart.width, canvasCart.height);
+				cIso.clearRect(0, 0, canvasIso.width, canvasIso.height);
+				cChars.clearRect(0, 0, canvasChars.width, canvasChars.height);
 				stageSelect();
 			}
 			else {
-				states.current = states.announcement;
-				states.prev = states.battleOver;
-				showAnnouncement('Battle Over');
+				if(gameStart == false) {
+					gameStart = true;
+					states.current = states.battleOver;
+					states.prev = states.battleOver;
+					checkState();
+				}
+				else {
+					states.current = states.announcement;
+					states.prev = states.battleOver;
+					showAnnouncement('Battle Over');
+				}
 			}
 		}
 	}
@@ -675,7 +732,61 @@ window.onload = function() {
 
 	function stageSelect() {
 		console.log('Mostrando stages');
+		let stages = document.getElementById('stageMenu_options');
+
+		for(let i = 0; i < unlockedStages; i++) {
+			stages.children[i].classList.remove('off');
+		}
 		showMenu('stageMenu');
+	}
+
+
+	function selectStage(currentStage) {
+		console.log('corriendo funcion de stage seleccionado');
+
+		let stageIndex = currentStage.split('stage');
+		stageIndex = parseInt(stageIndex[1]);
+
+		characters = [char1, char2, char3];
+
+		for(let i = 0; i < 3; i++) {
+			characters[i].charPos = characterPositions[stageIndex][i][1];
+			characters[i].facing = characterPositions[stageIndex][i][0];
+			characters[i].currentAnimation = characterPositions[stageIndex][i][0];
+			characters[i].ct = 0;
+			characters[i].acted = 0;
+			characters[i].moved = 0;
+			characters[i].casting = 0;
+			characters[i].calculateTileValues(gridWidth, gridHeight);
+		}
+
+		for(let i = 0; i < monsters[stageIndex].length; i++) {
+			console.log(monsters[stageIndex][i][0]);
+			console.log(monsters[stageIndex][i][1]);
+			let monster = new Character(charList[monsters[stageIndex][i][0]]);
+			monster.charPos = monsters[stageIndex][i][1];
+			monster.facing = monsters[stageIndex][i][2];
+			monster.currentAnimation = monsters[stageIndex][i][2];
+			monster.calculateTileValues(gridWidth, gridHeight);
+
+			characters.push(monster);
+			enemyParty.push(i + 3);
+		}
+
+		grid = gridList[stageIndex];
+
+		states.prev = states.idle;
+		states.current = states.idle;
+
+		hideMenus();
+
+		drawGrid();
+
+		animating = setInterval(animate, 1000/30);
+
+		battleOrder();
+
+		checkState();
 	}
 
 
@@ -1305,9 +1416,6 @@ window.onload = function() {
 		if(fxSp.charPos.length > 0) {
 			fxSp.animate();
 		}
-
-
-		setTimeout(animate, 1000/30);
 	}
 
 
@@ -1397,6 +1505,10 @@ window.onload = function() {
 					option.classList.add('off');
 				}
 				if(currentChar.acted > 0) {
+					let option = document.getElementById('act');
+					option.classList.add('off');
+				}
+				if(currentChar.casting > 0) {
 					let option = document.getElementById('act');
 					option.classList.add('off');
 				}
@@ -1808,6 +1920,10 @@ window.onload = function() {
 			case states.magicTarget:
 				menuSelect('magicTarget');
 				break;
+
+			case states.battleOver:
+				menuSelect('stageMenu');
+				break;
 		}
 	}
 
@@ -1971,6 +2087,12 @@ window.onload = function() {
 				console.log('Target the unit');
 				states.prev = states.targetUnit;
 				confirmAction('Command');
+				break;
+
+			case 'stage0':
+			case 'stage1':
+			case 'stage2':
+				selectStage(currentMenu);
 				break;
 		}
 	}
@@ -2174,7 +2296,7 @@ window.onload = function() {
 				case 'damage':
 					characters[target].hp -= damage;
 
-					if(characters[target].hp < 0) {	//Si muere
+					if(characters[target].hp <= 0) {	//Si muere
 
 						characters[target].hp = 0;
 						characters[target].cp = 0;
@@ -2195,6 +2317,8 @@ window.onload = function() {
 									enemyParty.splice(i, 1);
 								}
 							}
+							characters.splice(target, 1);
+							drawGrid();
 						}
 					}
 					break;
@@ -2301,7 +2425,12 @@ window.onload = function() {
 					showDamage('damage', damage, target[1]);
 				}
 				else {
-					console.log('Can you even miss?');
+					turno.shift();
+					states.current = states.announcement;
+
+					states.prev = states.idle;
+					
+					showAnnouncement('Miss!');
 				}
 			}
 		}
@@ -2753,26 +2882,10 @@ window.onload = function() {
 		document.getElementById('char3Moved').innerHTML = char3.moved;
 		document.getElementById('char3Tiles').innerHTML = char3.tileValues.length;
 
-		document.getElementById('char4Name').innerHTML = char4.name;
-		document.getElementById('char4Hp').innerHTML = char4.hp;
-		document.getElementById('char4Ct').innerHTML = char4.ct;
-		document.getElementById('char4Acted').innerHTML = char4.acted;
-		document.getElementById('char4Moved').innerHTML = char4.moved;
-		document.getElementById('char4Tiles').innerHTML = char4.tileValues.length;
-
-		if(slowActions.length > 0) {
-			document.getElementById('chargeActions').innerHTML = slowActions;
-		}
+		document.getElementById('charactersSpan').innerHTML = characters;
+		document.getElementById('characterPartySpan').innerHTML = playerParty;
+		document.getElementById('enemyPartySpan').innerHTML = enemyParty;
 
 		setTimeout(debug, 1000/60);
 	}
-
-	char1.charPos = [3,6];
-	char1.calculateTileValues(gridWidth, gridHeight);
-	char2.charPos = [4,5];
-	char2.calculateTileValues(gridWidth, gridHeight);
-	char3.charPos = [4,7];
-	char3.calculateTileValues(gridWidth, gridHeight);
-	char4.charPos = [2,6];
-	char4.calculateTileValues(gridWidth, gridHeight);
 }

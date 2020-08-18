@@ -69,17 +69,18 @@
 			Moved: <span id="char3Moved"></span><br>
 			Eval Tiles: <span id="char3Tiles"></span>
 		</div>
-		<div class="debug" id="Character_4" style="border:1px solid red; width:100px; float:left;">
-			<div id="char4Name"></div>
-			HP: <span id="char4Hp"></span><br>
-			CT: <span id="char4Ct"></span><br>
-			Acted: <span id="char4Acted"></span><br>
-			Moved: <span id="char4Moved"></span><br>
-			Eval Tiles: <span id="char4Tiles"></span>
+
+		<div class="debug" style="border:1px solid red; width:100px; float:left;">
+			Characters
+			<span id="charactersSpan"></span>
 		</div>
 
-		<div style="border:1px solid red; width:100px; float:left;">
-			Charge Actions: <span id="chargeActions"></span>
+		<div class="debug" style="border:1px solid red; width:100px; float:left;">
+			Parties
+			<br><br>
+			<span id="characterPartySpan"></span>
+			<br><br>
+			<span id="enemyPartySpan"></span>
 		</div>
 	</div>
 
@@ -181,9 +182,9 @@
 
 		<div class="menu hidden" id="stageMenu">
 			<ul id="stageMenu_options">
-				<li name="stage1" id="stage1" class="active">Stage 1</li>
-				<li name="stage2" id="stage2">Stage 2</li>
-				<li name="stage3" id="stage3">Stage 3</li>
+				<li name="stage0" id="stage0" class="active off">Stage 1</li>
+				<li name="stage1" id="stage1" class="off">Stage 2</li>
+				<li name="stage2" id="stage2" class="off">Stage 3</li>
 			</ul>
 		</div>
 
